@@ -1,0 +1,48 @@
+[gd_scene format=3 uid="uid://b8hgjyqktntul"]
+
+[ext_resource type="Texture2D" uid="uid://l1ul42rl6nqa" path="res://tree1.png" id="1_44ud8"]
+[ext_resource type="Texture2D" uid="uid://tjjvktg0lt1d" path="res://tree2.png" id="2_ind6k"]
+[ext_resource type="Texture2D" uid="uid://d2opok06m0sce" path="res://tree3.png" id="3_6vbnm"]
+[ext_resource type="Texture2D" uid="uid://jva3a7ggyhbo" path="res://tree4.png" id="4_bcqui"]
+[ext_resource type="Texture2D" uid="uid://bvn04dyiugdi8" path="res://tree5.png" id="5_bgygo"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_44ud8"]
+size = Vector2(11, 106)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_oph6y"]
+resource_name = "idle"
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_44ud8")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_ind6k")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_6vbnm")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_bcqui")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_bgygo")
+}],
+"loop": false,
+"name": &"default",
+"speed": 5.0
+}]
+
+[node name="Tree" type="Node2D" unique_id=683391033]
+
+[node name="RigidBody2D" type="RigidBody2D" parent="." unique_id=1115924081]
+position = Vector2(0.5, 72)
+gravity_scale = 0.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RigidBody2D" unique_id=2026488805]
+shape = SubResource("RectangleShape2D_44ud8")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="RigidBody2D" unique_id=1703414684]
+position = Vector2(-0.5, -72)
+sprite_frames = SubResource("SpriteFrames_oph6y")
+frame = 1
