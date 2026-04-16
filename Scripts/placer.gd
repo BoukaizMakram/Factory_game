@@ -6,10 +6,18 @@ extends Node2D
 @export var show_grid: bool = true
 @export var grid_color: Color = Color(1, 1, 1, 0.35)
 @export var grid_radius_cells: int = 12
+@export var place_sound: AudioStream
 
 var _ghost: Node2D
 var _ghost_shape: CollisionShape2D
+var _collider_offset: Vector2 = Vector2.ZERO
 var _placed: Array[Node2D] = []
+var _slot_1: PackedScene
+var _left_held: bool = false
+
+
+func _ready() -> void:
+	_slot_1 = selected_scene
 
 
 func _process(_delta: float) -> void:
@@ -23,19 +31,26 @@ func _process(_delta: float) -> void:
 		_spawn_ghost()
 
 	var cell: Vector2i = _world_to_cell(get_global_mouse_position())
-	_ghost.global_position = _cell_to_world(cell)
+	_ghost.global_position = _cell_to_world(cell) - _collider_offset
 
-	var blocked: bool = _is_blocked(_ghost.global_position)
+	var blocked: bool = _is_blocked(_cell_to_world(cell))
 	_tint(_ghost, Color(1, 0.3, 0.3, 0.6) if blocked else Color(0.3, 1, 0.3, 0.6))
+
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.pressed:
+		_left_held = false
 
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed:
 		if event.button_index == MOUSE_BUTTON_LEFT and selected_scene:
-			var cell: Vector2i = _world_to_cell(get_global_mouse_position())
-			var pos: Vector2 = _cell_to_world(cell)
-			if not _is_blocked(pos):
-				_place(pos)
+			if not _left_held:
+				var cell: Vector2i = _world_to_cell(get_global_mouse_position())
+				var pos: Vector2 = _cell_to_world(cell)
+				if not _is_blocked(pos):
+					_place(pos)
+				_left_held = true
 		elif event.button_index == MOUSE_BUTTON_RIGHT:
 			_remove_at(get_global_mouse_position())
 	elif event is InputEventKey and event.pressed and not event.echo:
@@ -43,14 +58,16 @@ func _unhandled_input(event: InputEvent) -> void:
 			selected_scene = null
 		elif event.keycode == KEY_G:
 			show_grid = not show_grid
+		elif event.keycode == KEY_1:
+			selected_scene = _slot_1
 
 
 func _draw() -> void:
-	if not show_grid:
+	if not show_grid or _ghost == null:
 		return
 	var cam: Camera2D = get_viewport().get_camera_2d()
 	var line_width: float = 1.0 / (cam.zoom.x if cam else 1.0)
-	var center: Vector2 = get_global_mouse_position()
+	var center: Vector2 = _ghost.global_position if _ghost else get_global_mouse_position()
 	var center_cell: Vector2i = _world_to_cell(center)
 	var r: int = grid_radius_cells
 	var max_dist: float = float(r * cell_size)
@@ -64,7 +81,7 @@ func _draw() -> void:
 				continue
 			var col: Color = grid_color
 			col.a *= 1.0 - d / max_dist
-			draw_line(a, b, col, line_width)
+			draw_line(to_local(a), to_local(b), col, line_width)
 
 	for dy in range(-r, r + 2):
 		for dx in range(-r, r + 1):
@@ -75,7 +92,7 @@ func _draw() -> void:
 				continue
 			var col: Color = grid_color
 			col.a *= 1.0 - d / max_dist
-			draw_line(a, b, col, line_width)
+			draw_line(to_local(a), to_local(b), col, line_width)
 
 
 func _spawn_ghost() -> void:
@@ -83,6 +100,7 @@ func _spawn_ghost() -> void:
 	add_child(_ghost)
 	_apply_display_scale(_ghost)
 	_ghost_shape = _find_collision_shape(_ghost)
+	_collider_offset = _get_collider_offset(_ghost, _ghost_shape)
 	_disable_physics(_ghost)
 	_force_on_top(_ghost)
 
@@ -95,30 +113,47 @@ func _force_on_top(node: Node) -> void:
 		_force_on_top(c)
 
 
+func _get_collider_offset(root: Node2D, shape: CollisionShape2D) -> Vector2:
+	if shape == null:
+		return Vector2.ZERO
+	return (shape.global_position - root.global_position)
+
+
 func _clear_ghost() -> void:
 	if _ghost:
 		_ghost.queue_free()
 		_ghost = null
 		_ghost_shape = null
+		_collider_offset = Vector2.ZERO
 
 
 func _place(pos: Vector2) -> void:
 	var obj: Node2D = selected_scene.instantiate()
 	var parent: Node = world if world else get_tree().current_scene
+	if parent is Node2D:
+		(parent as Node2D).y_sort_enabled = true
 	parent.add_child(obj)
-	obj.global_position = pos
+	obj.global_position = pos - _collider_offset
+	obj.z_index = 1
+	obj.z_as_relative = false
+	obj.y_sort_enabled = true
 	_apply_display_scale(obj)
 	_placed.append(obj)
+	if place_sound:
+		var sfx := AudioStreamPlayer.new()
+		sfx.stream = place_sound
+		sfx.bus = &"Master"
+		add_child(sfx)
+		sfx.play()
+		sfx.finished.connect(sfx.queue_free)
 
 
 func _apply_display_scale(node: Node2D) -> void:
 	node.scale = Vector2.ONE
 	if not node is Placeable:
-		print("[placer] not Placeable, skipping scale: ", node)
 		return
 	var target_px: float = (node as Placeable).display_size_px
 	var native: Vector2 = _get_native_size(node)
-	print("[placer] scaling ", node.name, " native=", native, " target_px=", target_px)
 	if native.x <= 0 or native.y <= 0:
 		return
 	var s: float = target_px / maxf(native.x, native.y)
