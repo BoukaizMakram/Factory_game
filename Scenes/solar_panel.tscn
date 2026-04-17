@@ -1,0 +1,49 @@
+[gd_scene format=3 uid="uid://b80lwyamka52c"]
+
+[ext_resource type="Script" uid="uid://bp5lko3igiqpl" path="res://Scripts/placeable.gd" id="0_script"]
+[ext_resource type="Texture2D" uid="uid://dv8x2yapcsd7c" path="res://Solar Panel/Right.png" id="1_efue1"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_ennlc"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_efue1")
+}],
+"loop": true,
+"name": &"left",
+"speed": 5.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_555cn"]
+size = Vector2(20, 8.820404)
+
+[node name="Solar Panel" type="Node2D" unique_id=1947233187]
+z_index = 5
+script = ExtResource("0_script")
+display_size_px = 512.0
+item_name = "Solar Panel"
+watts_produced = 5.0
+ignore_pipe_direction = true
+
+[node name="up" type="AnimatedSprite2D" parent="." unique_id=1686358345]
+sprite_frames = SubResource("SpriteFrames_ennlc")
+animation = &"left"
+
+[node name="down" type="AnimatedSprite2D" parent="." unique_id=1918953285]
+sprite_frames = SubResource("SpriteFrames_ennlc")
+animation = &"left"
+
+[node name="left" type="AnimatedSprite2D" parent="." unique_id=1924027339]
+sprite_frames = SubResource("SpriteFrames_ennlc")
+animation = &"left"
+
+[node name="right" type="AnimatedSprite2D" parent="." unique_id=2147443300]
+sprite_frames = SubResource("SpriteFrames_ennlc")
+animation = &"left"
+
+[node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=789759618]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D" unique_id=412964171]
+position = Vector2(0, -3.499998)
+scale = Vector2(9.41, 9.41)
+shape = SubResource("RectangleShape2D_555cn")

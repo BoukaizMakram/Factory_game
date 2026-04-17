@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://bl3jk4pdko5c6"]
+
+[ext_resource type="Texture2D" uid="uid://dtobvlgj6tqc7" path="res://Electrical Pipe/Grid.png" id="1_wf1aa"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_bin18"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_wf1aa")
+}],
+"loop": true,
+"name": &"grid",
+"speed": 5.0
+}]
+
+[node name="electrical_pipe grid" type="Node2D" unique_id=889128087]
+z_index = 1
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1303715165]
+sprite_frames = SubResource("SpriteFrames_bin18")
+animation = &"grid"

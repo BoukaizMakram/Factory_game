@@ -3,9 +3,8 @@
 [ext_resource type="Texture2D" uid="uid://bh1ver754c7a8" path="res://dirt 1.jpg" id="1_uu6xs"]
 [ext_resource type="Script" uid="uid://c50if86wmik0k" path="res://Scripts/camera_2d.gd" id="3_cm0pq"]
 [ext_resource type="Texture2D" uid="uid://cfnvgrg1y7xr0" path="res://gold ore.png" id="45_y1tbi"]
-[ext_resource type="PackedScene" uid="uid://ccj26pg14bkds" path="res://Drill.tscn" id="47_f4ese"]
+[ext_resource type="PackedScene" uid="uid://ccj26pg14bkds" path="res://Scenes/Drill.tscn" id="47_f4ese"]
 [ext_resource type="Script" uid="uid://bd0ojni33fj0m" path="res://Scripts/placer.gd" id="48_rchyr"]
-
 [sub_resource type="Gradient" id="Gradient_r0du0"]
 offsets = PackedFloat32Array(0, 0.42569658)
 colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1)
@@ -697,6 +696,7 @@ max_distance = 9959.0
 script = ExtResource("48_rchyr")
 cell_size = 64
 selected_scene = ExtResource("47_f4ese")
+placeable_scenes = [ExtResource("47_f4ese")]
 world = NodePath("..")
 
 [node name="Driller" parent="." unique_id=484496655 instance=ExtResource("47_f4ese")]

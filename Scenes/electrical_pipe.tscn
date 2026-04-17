@@ -1,0 +1,112 @@
+[gd_scene format=3 uid="uid://duw6oq0f8jx8b"]
+
+[ext_resource type="Script" uid="uid://baq7nsgq8u2ax" path="res://Scripts/electrical_pipe.gd" id="0_placeable"]
+[ext_resource type="Texture2D" uid="uid://by6mrt8dgdqnv" path="res://Electrical Pipe/right.png" id="2_8v6t6"]
+[ext_resource type="Texture2D" uid="uid://ds4hjpt0kijae" path="res://Electrical Pipe/Down.png" id="2_nuy26"]
+[ext_resource type="Texture2D" uid="uid://dtobvlgj6tqc7" path="res://Electrical Pipe/Grid.png" id="3_qppep"]
+[ext_resource type="Texture2D" uid="uid://tmr3rkbvoh6a" path="res://Electrical Pipe/Left.png" id="3_xkxx5"]
+[ext_resource type="Texture2D" uid="uid://dudwnbb0obhl5" path="res://Electrical Pipe/Up.png" id="5_qppep"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_tfwx1"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_8v6t6")
+}],
+"loop": true,
+"name": &"right",
+"speed": 5.0
+}]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_xkxx5"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_xkxx5")
+}],
+"loop": true,
+"name": &"left",
+"speed": 5.0
+}]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_qppep"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("5_qppep")
+}],
+"loop": true,
+"name": &"up",
+"speed": 5.0
+}]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_a6ovf"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_nuy26")
+}],
+"loop": true,
+"name": &"down",
+"speed": 5.0
+}]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_wef28"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_qppep")
+}],
+"loop": true,
+"name": &"grid",
+"speed": 5.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_8v6t6"]
+size = Vector2(16.790648, 10.626992)
+
+[sub_resource type="LabelSettings" id="LabelSettings_xkxx5"]
+font_size = 24
+
+[node name="Electrical Pipe" type="Node2D" unique_id=1720494924 node_paths=PackedStringArray("power_label")]
+z_index = 1
+script = ExtResource("0_placeable")
+power_label = NodePath("Label")
+display_size_px = 512.0
+item_name = "Electrical Pipe"
+
+[node name="right" type="AnimatedSprite2D" parent="." unique_id=27719191]
+sprite_frames = SubResource("SpriteFrames_tfwx1")
+animation = &"right"
+
+[node name="left" type="AnimatedSprite2D" parent="." unique_id=518359344]
+sprite_frames = SubResource("SpriteFrames_xkxx5")
+animation = &"left"
+
+[node name="up" type="AnimatedSprite2D" parent="." unique_id=395722344]
+sprite_frames = SubResource("SpriteFrames_qppep")
+animation = &"up"
+
+[node name="down" type="AnimatedSprite2D" parent="." unique_id=1456722372]
+sprite_frames = SubResource("SpriteFrames_a6ovf")
+animation = &"down"
+
+[node name="grid" type="AnimatedSprite2D" parent="." unique_id=1333253073]
+visible = false
+sprite_frames = SubResource("SpriteFrames_wef28")
+animation = &"grid"
+
+[node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=1327145980]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D" unique_id=388660649]
+position = Vector2(0, -5.999998)
+scale = Vector2(9.41, 9.41)
+shape = SubResource("RectangleShape2D_8v6t6")
+
+[node name="Label" type="Label" parent="." unique_id=612151005]
+offset_left = -92.0
+offset_top = 97.0
+offset_right = 7.0
+offset_bottom = 176.0
+text = "100"
+label_settings = SubResource("LabelSettings_xkxx5")

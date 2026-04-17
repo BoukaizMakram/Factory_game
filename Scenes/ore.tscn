@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://duomu3u8axvuq"]
+
+[ext_resource type="Texture2D" uid="uid://cfnvgrg1y7xr0" path="res://gold ore.png" id="1_b6xxr"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_b6xxr"]
+size = Vector2(500, 500)
+
+[node name="Ore" type="Node2D" unique_id=2138452341]
+z_index = 4
+scale = Vector2(0.13473253, 0.13473253)
+
+[node name="GoldOre" type="Sprite2D" parent="." unique_id=1436533916]
+texture = ExtResource("1_b6xxr")
+
+[node name="Area2D" type="Area2D" parent="." unique_id=1767147857]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=777185699]
+shape = SubResource("RectangleShape2D_b6xxr")
