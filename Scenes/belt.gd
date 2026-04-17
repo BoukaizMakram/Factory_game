@@ -51,43 +51,25 @@ func _process(delta: float) -> void:
 	_update_label(pl)
 
 
-func _tick(pl: Placeable, dt: float) -> void:
+func _tick(pl: Placeable, _dt: float) -> void:
 	var items: Array = pl.get_meta(META_KEY, [])
 	if items.is_empty():
 		return
 
 	var next_pl: Placeable = _find_next_belt(pl)
-	var next_items: Array = next_pl.get_meta(META_KEY, []) if next_pl != null else []
+	if next_pl == null:
+		return
 
-	items.sort_custom(func(a, b): return a["progress"] > b["progress"])
-
-	var advance: float = dt * ITEM_SPEED_PX / float(CELL_SIZE)
-	var leading_progress: float = 1.0 + MIN_SPACING
-	var transferred: bool = false
-	var to_move: Array = []
-
+	var to_remove: Array = []
 	for item in items:
-		var np: float = float(item["progress"]) + advance
-		var max_p: float = leading_progress - MIN_SPACING
-		if np > max_p:
-			np = max_p
-		if np < float(item["progress"]):
-			np = float(item["progress"])
-		if np >= 1.0:
-			if next_pl != null and not transferred and _has_room(next_items):
-				to_move.append(item)
-				transferred = true
-				leading_progress = np
-				item["progress"] = 1.0
-				continue
-			np = 1.0
-		item["progress"] = np
-		leading_progress = np
-
-	for t in to_move:
+		var visited: Dictionary = {}
+		visited[pl] = true
+		if _push_item_rec(next_pl.cell, item["type"], visited):
+			to_remove.append(item)
+		else:
+			break
+	for t in to_remove:
 		items.erase(t)
-		t["progress"] = 0.0
-		next_items.append(t)
 
 
 static func _has_room(items: Array) -> bool:
@@ -141,7 +123,24 @@ func _next_belt_label(pl: Placeable) -> String:
 
 
 func _find_next_belt(pl: Placeable) -> Placeable:
-	var dir: Vector2i = _dir_vec(pl.direction)
+	return _find_next_belt_static(pl)
+
+
+static func _dir_vec_static(d: int) -> Vector2i:
+	match d:
+		Placeable.Dir.UP:
+			return Vector2i(0, -1)
+		Placeable.Dir.DOWN:
+			return Vector2i(0, 1)
+		Placeable.Dir.LEFT:
+			return Vector2i(-1, 0)
+		Placeable.Dir.RIGHT:
+			return Vector2i(1, 0)
+	return Vector2i(1, 0)
+
+
+static func _find_next_belt_static(pl: Placeable) -> Placeable:
+	var dir: Vector2i = _dir_vec_static(pl.direction)
 	for i in range(1, 4):
 		var check_cell: Vector2i = pl.cell + dir * i
 		var cand = _belts_by_cell.get(check_cell, null)
@@ -199,12 +198,23 @@ static func has_room_at_entry(cell: Vector2i) -> bool:
 
 
 static func push_item(cell: Vector2i, type_key) -> bool:
+	return _push_item_rec(cell, type_key, {})
+
+
+static func _push_item_rec(cell: Vector2i, type_key, visited: Dictionary) -> bool:
 	var pl = _belts_by_cell.get(cell, null)
 	if pl == null or not is_instance_valid(pl):
 		return false
+	if visited.has(pl):
+		return false
+	visited[pl] = true
 	if not pl.has_meta(META_KEY):
 		pl.set_meta(META_KEY, [])
 	var items: Array = pl.get_meta(META_KEY)
+	var next_pl: Placeable = _find_next_belt_static(pl)
+	if next_pl != null:
+		if _push_item_rec(next_pl.cell, type_key, visited):
+			return true
 	if not _has_room(items):
 		return false
 	items.append({"type": type_key, "progress": 0.0})
