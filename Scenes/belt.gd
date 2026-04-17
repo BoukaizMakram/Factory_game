@@ -1,186 +1,218 @@
+class_name Belt
 extends Node2D
 
-@export var speed: float = 64.0
-@export var lane_snap_speed: float = 120.0
+const CELL_SIZE: int = 64
+const TICK_INTERVAL: float = 0.1
+const ITEM_SPEED_PX: float = 64.0
+const MIN_SPACING: float = 0.4
+const META_KEY: StringName = &"belt_items"
 
-var _belt_shape: Shape2D
-var _belt_shape_transform: Transform2D
-var _belt_half_length: float = 0.0
+@export var items_label: Label
+
+static var _belts_by_cell: Dictionary = {}
+
+var _tick_timer: float = 0.0
 
 
 func _ready() -> void:
-	var placeable = get_parent()
-	if placeable == null:
+	call_deferred("_try_register")
+
+
+func _try_register() -> void:
+	var pl := _get_placeable()
+	if pl == null or pl.ghost_mode:
 		return
-	for c in placeable.get_children():
-		if c is StaticBody2D:
-			for sc in c.get_children():
-				if sc is CollisionShape2D and sc.shape != null:
-					_belt_shape = sc.shape
-					_belt_shape_transform = placeable.global_transform.affine_inverse() * sc.global_transform
-					if _belt_shape is RectangleShape2D:
-						var rect := _belt_shape as RectangleShape2D
-						_belt_half_length = max(rect.size.x, rect.size.y) * 0.5 * placeable.scale.x
-					break
-			break
+	pl.refresh_cell_from_position()
+	_belts_by_cell[pl.cell] = pl
+	if not pl.has_meta(META_KEY):
+		pl.set_meta(META_KEY, [])
 
 
-func _physics_process(delta: float) -> void:
-	var placeable = get_parent()
-	if placeable == null or not (placeable is Placeable):
+func _exit_tree() -> void:
+	var pl := _get_placeable()
+	if pl == null:
 		return
-	if (placeable as Placeable).ghost_mode:
+	if _belts_by_cell.get(pl.cell, null) == pl:
+		_belts_by_cell.erase(pl.cell)
+
+
+func _process(delta: float) -> void:
+	if not visible:
 		return
-	if _belt_shape == null:
+	var pl := _get_placeable()
+	if pl == null or pl.ghost_mode:
+		return
+	_tick_timer += delta
+	if _tick_timer < TICK_INTERVAL:
+		return
+	var dt: float = _tick_timer
+	_tick_timer = 0.0
+	_tick(pl, dt)
+	_update_label(pl)
+
+
+func _tick(pl: Placeable, dt: float) -> void:
+	var items: Array = pl.get_meta(META_KEY, [])
+	if items.is_empty():
 		return
 
-	var dir: Vector2 = _get_belt_direction(placeable)
-	var center: Vector2 = placeable.global_position
+	var next_pl: Placeable = _find_next_belt(pl)
+	var next_items: Array = next_pl.get_meta(META_KEY, []) if next_pl != null else []
 
-	var space := get_world_2d().direct_space_state
-	var items: Array[Node2D] = _get_items_on_belt(space, placeable)
+	items.sort_custom(func(a, b): return a["progress"] > b["progress"])
 
-	var has_next_belt: bool = _has_belt_ahead(dir)
+	var advance: float = dt * ITEM_SPEED_PX / float(CELL_SIZE)
+	var leading_progress: float = 1.0 + MIN_SPACING
+	var transferred: bool = false
+	var to_move: Array = []
 
-	# Sort: furthest along belt first so leading items move before trailing ones
-	items.sort_custom(func(a: Node2D, b: Node2D) -> bool:
-		return (a.global_position - center).dot(dir) > (b.global_position - center).dot(dir)
-	)
-
-	var min_spacing: float = Placeable.CELL_SIZE * 0.4
-	# Collect positions of ALL items (including ones owned by other belts) for spacing
-	var all_positions: Array[Vector2] = []
 	for item in items:
-		all_positions.append(item.global_position)
-
-	for item in items:
-		if not _is_closest_belt(item):
-			continue
-
-		var offset_along: float = (item.global_position - center).dot(dir)
-
-		# Stop at the end if no next belt
-		if offset_along >= _belt_half_length - 2.0 and not has_next_belt:
-			continue
-
-		# Check if moving would get too close to any item AHEAD on the belt
-		var next_pos: Vector2 = item.global_position + dir * speed * delta
-		var blocked: bool = false
-		for i in range(all_positions.size()):
-			if all_positions[i] == item.global_position:
+		var np: float = float(item["progress"]) + advance
+		var max_p: float = leading_progress - MIN_SPACING
+		if np > max_p:
+			np = max_p
+		if np < float(item["progress"]):
+			np = float(item["progress"])
+		if np >= 1.0:
+			if next_pl != null and not transferred and _has_room(next_items):
+				to_move.append(item)
+				transferred = true
+				leading_progress = np
+				item["progress"] = 1.0
 				continue
-			var diff: Vector2 = all_positions[i] - next_pos
-			var ahead_dist: float = diff.dot(dir)
-			if ahead_dist >= 0.0 and ahead_dist < min_spacing:
-				blocked = true
-				break
-		if blocked:
-			continue
+			np = 1.0
+		item["progress"] = np
+		leading_progress = np
 
-		# Update position in the tracking array
-		var idx: int = all_positions.find(item.global_position)
-		item.global_position = next_pos
-		if idx >= 0:
-			all_positions[idx] = next_pos
-
-		# Snap to belt center on the perpendicular axis
-		if abs(dir.x) > 0.5:
-			var diff_y: float = center.y - item.global_position.y
-			if abs(diff_y) > 1.0:
-				item.global_position.y += sign(diff_y) * min(lane_snap_speed * delta, abs(diff_y))
-		elif abs(dir.y) > 0.5:
-			var diff_x: float = center.x - item.global_position.x
-			if abs(diff_x) > 1.0:
-				item.global_position.x += sign(diff_x) * min(lane_snap_speed * delta, abs(diff_x))
+	for t in to_move:
+		items.erase(t)
+		t["progress"] = 0.0
+		next_items.append(t)
 
 
-func _get_items_on_belt(space: PhysicsDirectSpaceState2D, placeable: Placeable) -> Array[Node2D]:
-	var items: Array[Node2D] = []
-	var params := PhysicsShapeQueryParameters2D.new()
-	params.shape = _belt_shape
-	params.transform = placeable.global_transform * _belt_shape_transform
-	params.collide_with_areas = true
-	params.collide_with_bodies = true
-	params.exclude = _collect_rids(placeable)
-	var results := space.intersect_shape(params, 32)
-
-	for result in results:
-		var body: Node = result["collider"]
-		if _is_placeable_child(body):
-			continue
-		if _is_mineable_collider(body):
-			continue
-		var item: Node2D = body.get_parent()
-		if item == null:
-			continue
-		if not items.has(item):
-			items.append(item)
-
-	return items
-
-
-func _has_belt_ahead(dir: Vector2) -> bool:
-	var placeable = get_parent() as Placeable
-	var dir_i := Vector2i(int(dir.x), int(dir.y))
-	for i in range(1, 4):
-		var check_cell: Vector2i = placeable.cell + dir_i * i
-		for node in get_tree().get_nodes_in_group("placeable"):
-			if node is Placeable and not node.is_pipe and node.cell == check_cell:
-				for c in node.get_children():
-					if c.get_script() == get_script():
-						return true
-	return false
-
-
-func _get_belt_direction(placeable: Placeable) -> Vector2:
-	match placeable.direction:
-		Placeable.Dir.UP:
-			return Vector2(0, -1)
-		Placeable.Dir.DOWN:
-			return Vector2(0, 1)
-		Placeable.Dir.LEFT:
-			return Vector2(-1, 0)
-		Placeable.Dir.RIGHT:
-			return Vector2(1, 0)
-	return Vector2(1, 0)
-
-
-func _collect_rids(node: Node) -> Array[RID]:
-	var rids: Array[RID] = []
-	if node is CollisionObject2D:
-		rids.append(node.get_rid())
-	for c in node.get_children():
-		var child_rids := _collect_rids(c)
-		rids.append_array(child_rids)
-	return rids
-
-
-
-func _is_closest_belt(item: Node2D) -> bool:
-	var my_placeable = get_parent() as Placeable
-	var my_dist: float = item.global_position.distance_squared_to(my_placeable.global_position)
-	for node in get_tree().get_nodes_in_group("placeable"):
-		if node is Placeable and not node.is_pipe and node != my_placeable:
-			for c in node.get_children():
-				if c.get_script() == get_script():
-					var dist: float = item.global_position.distance_squared_to(node.global_position)
-					if dist < my_dist:
-						return false
+static func _has_room(items: Array) -> bool:
+	for it in items:
+		if float(it["progress"]) < MIN_SPACING:
+			return false
 	return true
 
 
-func _is_mineable_collider(node: Node) -> bool:
-	if node is Area2D:
-		for c in node.get_children():
-			if c.get("ore_name") != null or c.name == "Mineable":
-				return true
-	return false
+func _dir_vec(d: int) -> Vector2i:
+	match d:
+		Placeable.Dir.UP:
+			return Vector2i(0, -1)
+		Placeable.Dir.DOWN:
+			return Vector2i(0, 1)
+		Placeable.Dir.LEFT:
+			return Vector2i(-1, 0)
+		Placeable.Dir.RIGHT:
+			return Vector2i(1, 0)
+	return Vector2i(1, 0)
 
 
-func _is_placeable_child(node: Node) -> bool:
-	var current: Node = node
-	while current != null:
-		if current is Placeable:
-			return true
-		current = current.get_parent()
-	return false
+func _get_placeable() -> Placeable:
+	var p: Node = get_parent()
+	if p is Placeable:
+		return p as Placeable
+	return null
+
+
+func _update_label(pl: Placeable) -> void:
+	var label: Label = _resolve_label(pl)
+	if label == null:
+		return
+	var items: Array = pl.get_meta(META_KEY, [])
+	var counts: Dictionary = {}
+	for it in items:
+		var key_name: String = _type_name(it["type"])
+		counts[key_name] = counts.get(key_name, 0) + 1
+	var lines: Array = []
+	for k in counts:
+		lines.append("%s: %d" % [k, counts[k]])
+	lines.append("next belt: " + _next_belt_label(pl))
+	label.text = "\n".join(lines)
+
+
+func _next_belt_label(pl: Placeable) -> String:
+	var next_pl := _find_next_belt(pl)
+	if next_pl == null:
+		return "N/A"
+	return _dir_name(pl.direction)
+
+
+func _find_next_belt(pl: Placeable) -> Placeable:
+	var dir: Vector2i = _dir_vec(pl.direction)
+	for i in range(1, 4):
+		var check_cell: Vector2i = pl.cell + dir * i
+		var cand = _belts_by_cell.get(check_cell, null)
+		if cand != null and is_instance_valid(cand):
+			return cand
+	return null
+
+
+static func _dir_name(d: int) -> String:
+	match d:
+		Placeable.Dir.UP:
+			return "up"
+		Placeable.Dir.DOWN:
+			return "down"
+		Placeable.Dir.LEFT:
+			return "left"
+		Placeable.Dir.RIGHT:
+			return "right"
+	return "?"
+
+
+func _resolve_label(pl: Placeable) -> Label:
+	if items_label != null and is_instance_valid(items_label):
+		return items_label
+	for c in pl.get_children():
+		if c is Label:
+			return c as Label
+	return null
+
+
+static func _type_name(t) -> String:
+	if t is String:
+		return t
+	if t is StringName:
+		return String(t)
+	if t is PackedScene:
+		var path := (t as PackedScene).resource_path
+		if path != "":
+			return path.get_file().get_basename()
+	return str(t)
+
+
+# ── Public static API ────────────────────────────────────────────────
+
+static func has_belt_at(cell: Vector2i) -> bool:
+	var pl = _belts_by_cell.get(cell, null)
+	return pl != null and is_instance_valid(pl)
+
+
+static func has_room_at_entry(cell: Vector2i) -> bool:
+	var pl = _belts_by_cell.get(cell, null)
+	if pl == null or not is_instance_valid(pl):
+		return false
+	return _has_room(pl.get_meta(META_KEY, []))
+
+
+static func push_item(cell: Vector2i, type_key) -> bool:
+	var pl = _belts_by_cell.get(cell, null)
+	if pl == null or not is_instance_valid(pl):
+		return false
+	if not pl.has_meta(META_KEY):
+		pl.set_meta(META_KEY, [])
+	var items: Array = pl.get_meta(META_KEY)
+	if not _has_room(items):
+		return false
+	items.append({"type": type_key, "progress": 0.0})
+	return true
+
+
+static func get_items(cell: Vector2i) -> Array:
+	var pl = _belts_by_cell.get(cell, null)
+	if pl == null or not is_instance_valid(pl):
+		return []
+	return pl.get_meta(META_KEY, [])

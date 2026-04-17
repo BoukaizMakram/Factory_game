@@ -91,6 +91,9 @@ func _set_drilling(active: bool) -> void:
 
 
 func _is_output_blocked(marker: Marker2D) -> bool:
+	var cell := _marker_cell(marker)
+	if Belt.has_belt_at(cell):
+		return not Belt.has_room_at_entry(cell)
 	var space: PhysicsDirectSpaceState2D = get_world_2d().direct_space_state
 	var params := PhysicsShapeQueryParameters2D.new()
 	var rect := RectangleShape2D.new()
@@ -108,6 +111,10 @@ func _is_output_blocked(marker: Marker2D) -> bool:
 			continue
 		return true
 	return false
+
+
+func _marker_cell(marker: Marker2D) -> Vector2i:
+	return Vector2i(floor(marker.global_position.x / float(Placeable.CELL_SIZE)), floor(marker.global_position.y / float(Placeable.CELL_SIZE)))
 
 
 func _is_mineable_area(node: Node) -> bool:
@@ -128,6 +135,11 @@ func _is_placeable_child(node: Node) -> bool:
 
 
 func _spawn_ore(ore_scene: PackedScene, marker: Marker2D) -> void:
+	var cell := _marker_cell(marker)
+	if Belt.has_belt_at(cell):
+		var ore_name: String = _mineable.get("ore_name") if _mineable != null else ""
+		Belt.push_item(cell, ore_name)
+		return
 	var ore: Node2D = ore_scene.instantiate()
 	ore.global_position = marker.global_position
 	get_tree().current_scene.add_child(ore)

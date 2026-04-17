@@ -806,38 +806,46 @@ animations = [{
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_burr4"]
 size = Vector2(18.916046, 13.496281)
 
+[sub_resource type="LabelSettings" id="LabelSettings_ca57l"]
+font_size = 10
+outline_size = 3
+outline_color = Color(0, 0, 0, 1)
+
 [node name="Belt" type="Node2D" unique_id=412738995]
 z_index = 2
 script = ExtResource("0_placeable")
 display_size_px = 512.0
 
-[node name="up" type="AnimatedSprite2D" parent="." unique_id=2091102403]
+[node name="up" type="AnimatedSprite2D" parent="." unique_id=2091102403 node_paths=PackedStringArray("items_label")]
 visible = false
 z_index = 2
 sprite_frames = SubResource("SpriteFrames_s4cui")
 animation = &"up"
 script = ExtResource("1_yku3c")
+items_label = NodePath("../Control/Label")
 
-[node name="down" type="AnimatedSprite2D" parent="." unique_id=86646596]
+[node name="down" type="AnimatedSprite2D" parent="." unique_id=86646596 node_paths=PackedStringArray("items_label")]
 visible = false
 z_index = 2
 sprite_frames = SubResource("SpriteFrames_vf1qt")
 animation = &"down"
 script = ExtResource("1_yku3c")
+items_label = NodePath("../Control/Label")
 
-[node name="left" type="AnimatedSprite2D" parent="." unique_id=459012743]
+[node name="left" type="AnimatedSprite2D" parent="." unique_id=459012743 node_paths=PackedStringArray("items_label")]
 visible = false
 z_index = 2
 sprite_frames = SubResource("SpriteFrames_wpvyb")
 animation = &"left"
 script = ExtResource("1_yku3c")
+items_label = NodePath("../Control/Label")
 
-[node name="right" type="AnimatedSprite2D" parent="." unique_id=478143766]
+[node name="right" type="AnimatedSprite2D" parent="." unique_id=478143766 node_paths=PackedStringArray("items_label")]
 z_index = 2
 sprite_frames = SubResource("SpriteFrames_wy0q2")
 animation = &"right"
 script = ExtResource("1_yku3c")
-speed = 20.0
+items_label = NodePath("../Control/Label")
 
 [node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=118721376]
 z_index = 10
@@ -846,3 +854,20 @@ z_index = 10
 position = Vector2(0, -14.5)
 scale = Vector2(9.41, 9.41)
 shape = SubResource("RectangleShape2D_burr4")
+
+[node name="Control" type="Control" parent="." unique_id=894079164]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Label" type="Label" parent="Control" unique_id=457784039]
+z_index = 10
+layout_mode = 0
+offset_left = -79.0
+offset_top = -65.0
+offset_right = 85.0
+offset_bottom = 25.0
+text = "1222222222222"
+label_settings = SubResource("LabelSettings_ca57l")
+horizontal_alignment = 1
