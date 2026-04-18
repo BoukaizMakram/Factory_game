@@ -101,6 +101,7 @@
 [ext_resource type="Texture2D" uid="uid://tb4xb5oyuknf" path="res://Drill/left/10001.png" id="50_k346c"]
 [ext_resource type="Texture2D" uid="uid://cjla4dxq6ux85" path="res://Drill/left/10002.png" id="51_lvcxd"]
 [ext_resource type="Texture2D" uid="uid://chm0d72ua5eu" path="res://Drill/left/10003.png" id="52_sn4p0"]
+[ext_resource type="Texture2D" uid="uid://dk4rqqlntoayo" path="res://UI/Arrow.png" id="52_wjee0"]
 [ext_resource type="Texture2D" uid="uid://b4yl4cmk4bnbj" path="res://Drill/left/10004.png" id="53_1ncrd"]
 [ext_resource type="Texture2D" uid="uid://csyf1fwphifoi" path="res://Drill/left/10005.png" id="54_rmdg1"]
 [ext_resource type="Texture2D" uid="uid://ccq61pny4udxk" path="res://Drill/left/10006.png" id="55_kq7v1"]
@@ -194,6 +195,8 @@
 [ext_resource type="Texture2D" uid="uid://bc3j6kxh1joq0" path="res://Drill/up/10046.png" id="191_dfj8d"]
 [ext_resource type="Texture2D" uid="uid://bmnudnlgn8bp4" path="res://Drill/up/10047.png" id="192_c28y4"]
 [ext_resource type="Texture2D" uid="uid://dvd2wkcve15f" path="res://Drill/up/10048.png" id="193_2arwu"]
+[ext_resource type="Texture2D" uid="uid://bylc4vu70u8nc" path="res://Paticle System/smoke_01.png" id="197_dfj8d"]
+[ext_resource type="Texture2D" uid="uid://3o70ldiyv0sh" path="res://UI/rectanglex2.png" id="197_wjee0"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_udjce"]
 animations = [{
@@ -800,19 +803,38 @@ animations = [{
 }],
 "loop": true,
 "name": &"default",
-"speed": 15.0
+"speed": 24.0
 }]
 
+[sub_resource type="Curve" id="Curve_c28y4"]
+_limits = [-360.0, 360.0, 0.0, 1.0]
+_data = [Vector2(0.015570931, -10.070862), 0.0, 0.0, 0, 0, Vector2(0.25432527, 285.52032), 0.0, 0.0, 0, 0, Vector2(0.5051903, -19.380829), 0.0, 0.0, 0, 0, Vector2(0.7543253, 348.36255), 0.0, 0.0, 0, 0, Vector2(0.9982699, -17.053345), 0.0, 0.0, 0, 0]
+point_count = 5
+
+[sub_resource type="Curve" id="Curve_2arwu"]
+_data = [Vector2(0, 0.5506652), 0.0, 0.0, 0, 0, Vector2(1, 0.004351616), -0.7847523, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Gradient" id="Gradient_yd6p5"]
+offsets = PackedFloat32Array(0, 0.3330275, 0.94220185, 1)
+colors = PackedColorArray(0.42816553, 0.22039935, 4.813075e-08, 0, 0.1882353, 0.08235294, 0, 0.12156863, 0.47305354, 0.21157986, 0, 0, 1, 1, 1, 1)
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_fceky"]
-size = Vector2(164, 122)
+size = Vector2(134, 100)
 
 [node name="Driller" type="Node2D" unique_id=484496655]
 z_index = 5
 script = ExtResource("1_ckila")
 display_size_px = 512.0
 item_name = "Drill"
-watts_consumed = 10.0
+watts_consumed = 1.0
+footprint_height_cells = 4
 is_miner = true
+animation_max_fps = 16.0
+
+[node name="DrillerLogic" type="Node2D" parent="." unique_id=641673417]
+script = ExtResource("49_g7rj5")
+mining_time_multiplier = 2.0
 
 [node name="up" type="AnimatedSprite2D" parent="." unique_id=2018185116]
 visible = false
@@ -820,23 +842,46 @@ z_index = 5
 position = Vector2(0, -73)
 sprite_frames = SubResource("SpriteFrames_udjce")
 animation = &"up"
-script = ExtResource("49_g7rj5")
+frame_progress = 0.6213745
 
 [node name="Marker2D" type="Marker2D" parent="up" unique_id=552477059]
-visible = false
-position = Vector2(0, -182)
+position = Vector2(0, -252.88501)
 rotation = -1.5707964
+
+[node name="Hover" type="Sprite2D" parent="up" unique_id=434976015]
+z_index = 10
+position = Vector2(1, -19)
+scale = Vector2(0.83176386, 0.83176386)
+texture = ExtResource("197_wjee0")
+
+[node name="Arrow" type="Sprite2D" parent="up" unique_id=992444583]
+z_index = 10
+position = Vector2(1, -251.88501)
+scale = Vector2(0.4426269, 0.4426269)
+texture = ExtResource("52_wjee0")
 
 [node name="down" type="AnimatedSprite2D" parent="." unique_id=1280177853]
 visible = false
 z_index = 5
 sprite_frames = SubResource("SpriteFrames_h0utk")
 animation = &"down"
-script = ExtResource("49_g7rj5")
 
 [node name="Marker2D" type="Marker2D" parent="down" unique_id=645405649]
-position = Vector2(0, 69)
+position = Vector2(0, 138)
 rotation = 1.5707964
+
+[node name="Hover" type="Sprite2D" parent="down" unique_id=1830913102]
+z_index = 10
+position = Vector2(1, -92)
+scale = Vector2(0.83176386, 0.83176386)
+texture = ExtResource("197_wjee0")
+
+[node name="Arrow" type="Sprite2D" parent="down" unique_id=642505756]
+z_index = 10
+position = Vector2(1, 136.99997)
+rotation = 3.1415927
+scale = Vector2(0.4426269, 0.4426269)
+texture = ExtResource("52_wjee0")
 
 [node name="left" type="AnimatedSprite2D" parent="." unique_id=112861365]
 visible = false
@@ -844,22 +889,99 @@ z_index = 5
 position = Vector2(0, -70)
 sprite_frames = SubResource("SpriteFrames_8y1i8")
 animation = &"left"
-script = ExtResource("49_g7rj5")
 
 [node name="Marker2D" type="Marker2D" parent="left" unique_id=1531917085]
-position = Vector2(-100, 50)
+position = Vector2(-191, 50)
 rotation = -3.1415927
+
+[node name="Hover" type="Sprite2D" parent="left" unique_id=1587938627]
+z_index = 10
+position = Vector2(0, -22)
+scale = Vector2(0.83176386, 0.83176386)
+texture = ExtResource("197_wjee0")
+
+[node name="Arrow" type="Sprite2D" parent="left" unique_id=1191609791]
+z_index = 10
+position = Vector2(-192, 50)
+rotation = 4.712389
+scale = Vector2(0.4426269, 0.4426269)
+texture = ExtResource("52_wjee0")
 
 [node name="right" type="AnimatedSprite2D" parent="." unique_id=1303272957]
 z_index = 5
 sprite_frames = SubResource("SpriteFrames_hsyw6")
-script = ExtResource("49_g7rj5")
+frame = 41
+frame_progress = 0.07598748
 
 [node name="Marker2D" type="Marker2D" parent="right" unique_id=257733163]
 position = Vector2(173, -20)
 
+[node name="Hover" type="Sprite2D" parent="right" unique_id=1533096870]
+z_index = 10
+position = Vector2(1, -93.00001)
+scale = Vector2(0.83176386, 0.83176386)
+texture = ExtResource("197_wjee0")
+
+[node name="Arrow" type="Sprite2D" parent="right" unique_id=1792333947]
+z_index = 10
+position = Vector2(173, -20)
+rotation = 1.5707964
+scale = Vector2(0.4426269, 0.4426269)
+texture = ExtResource("52_wjee0")
+
+[node name="CPUParticles2D2" type="CPUParticles2D" parent="." unique_id=35221605]
+z_index = 5
+position = Vector2(-0.99999994, -9)
+rotation = 3.1415925
+scale = Vector2(2.199471, -0.047035668)
+emitting = false
+amount = 100
+texture = ExtResource("197_dfj8d")
+lifetime = 0.15000000000000002
+speed_scale = 0.4
+randomness = 1.0
+emission_shape = 1
+emission_sphere_radius = 26.83
+direction = Vector2(0, -1)
+spread = 0.0
+gravity = Vector2(0, -980)
+initial_velocity_min = 67.34
+initial_velocity_max = 957.91
+angular_velocity_curve = SubResource("Curve_c28y4")
+scale_amount_min = 0.05
+scale_amount_max = 1.1
+scale_amount_curve = SubResource("Curve_2arwu")
+color_ramp = SubResource("Gradient_yd6p5")
+
 [node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=638087721]
+visible = false
 z_index = 5
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D" unique_id=1894951194]
 shape = SubResource("RectangleShape2D_fceky")
+
+[node name="CPUParticles2D" type="CPUParticles2D" parent="StaticBody2D" unique_id=627924069]
+visible = false
+position = Vector2(-2, 11)
+rotation = 3.1415925
+scale = Vector2(4.092782, -0.64895904)
+emitting = false
+amount = 500
+texture = ExtResource("197_dfj8d")
+lifetime = 0.15000000000000002
+speed_scale = 0.4
+randomness = 1.0
+emission_shape = 1
+emission_sphere_radius = 26.83
+direction = Vector2(0, -1)
+spread = 0.0
+gravity = Vector2(0, -980)
+initial_velocity_min = 67.34
+initial_velocity_max = 957.91
+angular_velocity_curve = SubResource("Curve_c28y4")
+scale_amount_min = 0.05
+scale_amount_max = 1.1
+scale_amount_curve = SubResource("Curve_2arwu")
+color_ramp = SubResource("Gradient_yd6p5")
+
+[node name="inventory_item" type="Sprite2D" parent="." unique_id=2002083345]

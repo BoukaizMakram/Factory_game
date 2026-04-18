@@ -1,0 +1,198 @@
+[gd_scene format=3 uid="uid://dfan45jqd1n6n"]
+
+[ext_resource type="Script" uid="uid://docsgtgh1ma2i" path="res://Scripts/inventory_ui.gd" id="1_inventory_ui"]
+[ext_resource type="AudioStream" uid="uid://c1013pknllfpw" path="res://SFX/raw/inventory open.wav" id="2_open"]
+[ext_resource type="AudioStream" uid="uid://d1idjswbuw6eo" path="res://SFX/raw/inventory.wav" id="3_close"]
+[ext_resource type="Script" uid="uid://dtnis1rsvhhp4" path="res://Scripts/hotbar_ui.gd" id="4_hotbar_ui"]
+[ext_resource type="Script" uid="uid://cmxvoxkukfqwf" path="res://Scripts/ui.gd" id="5_ui_logic"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_hud"]
+font_size = 39
+
+[node name="UI" type="Node2D" unique_id=1170886443]
+script = ExtResource("5_ui_logic")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1513568769]
+
+[node name="InventoryUI" type="Control" parent="CanvasLayer" unique_id=926867665 node_paths=PackedStringArray("inventory_holder_path")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_inventory_ui")
+open_sound = ExtResource("2_open")
+close_sound = ExtResource("3_close")
+inventory_holder_path = NodePath("../../../PlayerInventory")
+
+[node name="Backdrop" type="ColorRect" parent="CanvasLayer/InventoryUI" unique_id=878769519]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.02, 0.025, 0.025, 0.78)
+
+[node name="Title" type="Label" parent="CanvasLayer/InventoryUI" unique_id=148651513]
+layout_mode = 0
+offset_left = 220.0
+offset_top = 95.0
+offset_right = 820.0
+offset_bottom = 165.0
+text = "INVENTORY"
+
+[node name="Close" type="Button" parent="CanvasLayer/InventoryUI" unique_id=1551414343]
+layout_mode = 0
+offset_left = 1772.0
+offset_top = 36.0
+offset_right = 1898.0
+offset_bottom = 162.0
+theme_override_font_sizes/font_size = 30
+text = "X"
+
+[node name="Panel" type="Panel" parent="CanvasLayer/InventoryUI" unique_id=1940742575]
+layout_mode = 0
+offset_left = 220.0
+offset_top = 150.0
+offset_right = 1730.0
+offset_bottom = 955.0
+
+[node name="Grid" type="GridContainer" parent="CanvasLayer/InventoryUI/Panel" unique_id=752843851]
+layout_mode = 0
+offset_left = 325.0
+offset_top = 74.0
+offset_right = 1185.0
+offset_bottom = 731.0
+columns = 6
+
+[node name="SlotTemplate" type="Button" parent="CanvasLayer/InventoryUI/Panel/Grid" unique_id=349802315]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+
+[node name="Selected" type="ColorRect" parent="CanvasLayer/InventoryUI/Panel/Grid/SlotTemplate" unique_id=1708470995]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0.18)
+
+[node name="Icon" type="TextureRect" parent="CanvasLayer/InventoryUI/Panel/Grid/SlotTemplate" unique_id=1297934377]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 6.0
+offset_right = 88.0
+offset_bottom = 86.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Amount" type="Label" parent="CanvasLayer/InventoryUI/Panel/Grid/SlotTemplate" unique_id=387194448]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 62.0
+offset_right = 88.0
+offset_bottom = 94.0
+horizontal_alignment = 2
+vertical_alignment = 2
+
+[node name="HotbarUI" type="Control" parent="CanvasLayer" unique_id=725148772 node_paths=PackedStringArray("inventory_holder_path")]
+layout_mode = 3
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -520.0
+offset_top = -122.0
+offset_right = 520.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 1
+script = ExtResource("4_hotbar_ui")
+inventory_holder_path = NodePath("../../../PlayerInventory")
+
+[node name="Grid" type="GridContainer" parent="CanvasLayer/HotbarUI" unique_id=1990323179]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+columns = 10
+
+[node name="SlotTemplate" type="Button" parent="CanvasLayer/HotbarUI/Grid" unique_id=526259051]
+custom_minimum_size = Vector2(84, 84)
+layout_mode = 2
+
+[node name="Selected" type="ColorRect" parent="CanvasLayer/HotbarUI/Grid/SlotTemplate" unique_id=18792218]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0.18)
+
+[node name="Icon" type="TextureRect" parent="CanvasLayer/HotbarUI/Grid/SlotTemplate" unique_id=982696112]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 6.0
+offset_right = 76.0
+offset_bottom = 74.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Amount" type="Label" parent="CanvasLayer/HotbarUI/Grid/SlotTemplate" unique_id=1815119088]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 52.0
+offset_right = 76.0
+offset_bottom = 82.0
+horizontal_alignment = 2
+vertical_alignment = 2
+
+[node name="GUI" type="Control" parent="CanvasLayer" unique_id=2076096248]
+layout_mode = 3
+anchors_preset = 0
+offset_top = 1050.9999
+offset_right = 52.0
+offset_bottom = 1104.9999
+scale = Vector2(0.46013948, 0.46013948)
+
+[node name="Panel" type="Panel" parent="CanvasLayer/GUI" unique_id=946478213]
+visible = false
+layout_mode = 0
+offset_left = 46.0
+offset_top = -586.7785
+offset_right = 1866.0
+offset_bottom = -85.7785
+
+[node name="Label" type="Label" parent="CanvasLayer/GUI" unique_id=529350251]
+visible = false
+layout_mode = 0
+offset_left = 80.0
+offset_top = -566.7785
+offset_right = 291.0
+offset_bottom = -506.7785
+text = "Item: Belt	"
+label_settings = SubResource("LabelSettings_hud")
+
+[node name="Label2" type="Label" parent="CanvasLayer/GUI" unique_id=1585874816]
+visible = false
+layout_mode = 0
+offset_left = 80.0
+offset_top = -495.7785
+offset_right = 1426.0
+offset_bottom = -147.7785
+text = "Count: 0	"
+label_settings = SubResource("LabelSettings_hud")

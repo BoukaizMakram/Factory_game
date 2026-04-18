@@ -1,0 +1,15 @@
+{
+    "files.exclude": {
+        "**/*.uid": true,
+        "*.cfg": true,
+        "*.scn": true,
+        "*.sln": true,
+        "*.tscn": true,
+        "*.vcxproj*": true,
+        ".godot": true,
+        ".vs": true,
+        ".vscode": true,
+        "project.godot": true,
+        "vc*.pdb": true
+    }
+}

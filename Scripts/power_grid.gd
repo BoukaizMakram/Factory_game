@@ -106,6 +106,8 @@ func _rebuild() -> void:
 		if not is_instance_valid(_machines[k]):
 			_machines.erase(k)
 
+	_refresh_pipe_connections_for_rebuild()
+
 	var visited: Dictionary = {}  # pipe cell -> true
 	var handled_machines: Dictionary = {}  # machine cell -> true
 	var network_count: int = 0
@@ -134,6 +136,11 @@ func _rebuild() -> void:
 			for pc in extended:
 				if not network_pipes.has(pc) and _pipes.has(pc):
 					stack.append(pc)
+			for other_cell in _pipes.keys():
+				if other_cell == c or network_pipes.has(other_cell):
+					continue
+				if _pipes_reach_each_other(c, other_cell):
+					stack.append(other_cell)
 
 		# Mark all as visited so other networks don't re-process them
 		for c in network_pipes.keys():
@@ -166,7 +173,7 @@ func _rebuild() -> void:
 			consumed += m.watts_consumed
 
 		var net_power: float = produced - consumed
-		var has_power: bool = net_power >= 0.5
+		var has_power: bool = net_power > 0.5
 		var ratio: float = 0.0
 		if consumed > 0.0 and has_power:
 			ratio = clampf(produced / consumed, 0.0, 1.0)
@@ -176,10 +183,7 @@ func _rebuild() -> void:
 		# Step 4: Apply to this network's pipes
 		for cell in network_pipes.keys():
 			if _pipes.has(cell) and is_instance_valid(_pipes[cell]):
-				if has_power:
-					_pipes[cell].set_pipe_powered(true, produced, consumed)
-				else:
-					_pipes[cell].set_pipe_powered(false)
+				_pipes[cell].set_pipe_powered(has_power, produced, consumed)
 
 		# Step 5: Apply to this network's machines
 		for cell in network_machines.keys():
@@ -197,3 +201,19 @@ func _rebuild() -> void:
 			_machines[cell].set_powered(false, 0.0)
 
 	networks_updated.emit(network_count)
+
+
+func _refresh_pipe_connections_for_rebuild() -> void:
+	for pipe in _pipes.values():
+		if pipe != null and is_instance_valid(pipe) and pipe.has_method("update_connections"):
+			pipe.update_connections(false)
+
+
+func _pipes_reach_each_other(a_cell: Vector2i, b_cell: Vector2i) -> bool:
+	if not _pipes.has(a_cell) or not _pipes.has(b_cell):
+		return false
+	var a = _pipes[a_cell]
+	var b = _pipes[b_cell]
+	if not is_instance_valid(a) or not is_instance_valid(b):
+		return false
+	return a.get_powered_cells().has(b_cell) or b.get_powered_cells().has(a_cell)

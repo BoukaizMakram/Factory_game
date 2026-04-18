@@ -62,8 +62,19 @@ animations = [{
 "speed": 5.0
 }]
 
+[sub_resource type="SpriteFrames" id="SpriteFrames_qmxlv"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_qppep")
+}],
+"loop": true,
+"name": &"grid",
+"speed": 5.0
+}]
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_8v6t6"]
-size = Vector2(16.790648, 10.626992)
+size = Vector2(16.471838, 8.289054)
 
 [sub_resource type="LabelSettings" id="LabelSettings_xkxx5"]
 font_size = 24
@@ -74,20 +85,25 @@ script = ExtResource("0_placeable")
 power_label = NodePath("Label")
 display_size_px = 512.0
 item_name = "Electrical Pipe"
+ignore_pipe_direction = true
 
 [node name="right" type="AnimatedSprite2D" parent="." unique_id=27719191]
+visible = false
 sprite_frames = SubResource("SpriteFrames_tfwx1")
 animation = &"right"
 
 [node name="left" type="AnimatedSprite2D" parent="." unique_id=518359344]
+visible = false
 sprite_frames = SubResource("SpriteFrames_xkxx5")
 animation = &"left"
 
 [node name="up" type="AnimatedSprite2D" parent="." unique_id=395722344]
+visible = false
 sprite_frames = SubResource("SpriteFrames_qppep")
 animation = &"up"
 
 [node name="down" type="AnimatedSprite2D" parent="." unique_id=1456722372]
+visible = false
 sprite_frames = SubResource("SpriteFrames_a6ovf")
 animation = &"down"
 
@@ -96,10 +112,14 @@ visible = false
 sprite_frames = SubResource("SpriteFrames_wef28")
 animation = &"grid"
 
+[node name="cross" type="AnimatedSprite2D" parent="." unique_id=814172429]
+sprite_frames = SubResource("SpriteFrames_qmxlv")
+animation = &"grid"
+
 [node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=1327145980]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D" unique_id=388660649]
-position = Vector2(0, -5.999998)
+position = Vector2(1.499999, -5.999998)
 scale = Vector2(9.41, 9.41)
 shape = SubResource("RectangleShape2D_8v6t6")
 

@@ -11,9 +11,13 @@ const CELL_SIZE: int = 64
 @export var watts_consumed: float = 0.0
 @export var direction: int = Dir.RIGHT
 @export var cell_span: int = 0
+@export var footprint_width_cells: int = 3
+@export var footprint_height_cells: int = 2
 @export var is_miner: bool = false
 @export var ignore_pipe_direction: bool = false
-@export var is_belt: bool = false
+@export var allow_belt_overlap: bool = false
+@export var animation_min_fps: float = 5.0
+@export var animation_max_fps: float = 24.0
 
 var is_pipe: bool = false
 
@@ -24,7 +28,7 @@ var _power_ratio: float = 1.0
 
 signal power_state_changed(is_powered: bool)
 
-const DIR_VECTORS := {
+const DIR_VECTORS: Dictionary = {
 	Dir.UP: Vector2i(0, -1),
 	Dir.DOWN: Vector2i(0, 1),
 	Dir.LEFT: Vector2i(-1, 0),
@@ -45,7 +49,7 @@ static func direction_name(d: int) -> String:
 	return "default"
 
 
-const ANIM_FALLBACKS := {
+const ANIM_FALLBACKS: Dictionary = {
 	Dir.LEFT: ["left", "default"],
 	Dir.RIGHT: ["right", "default"],
 	Dir.UP: ["up", "Rotated"],
@@ -98,10 +102,34 @@ func effective_span() -> int:
 	return max(1, cell_span)
 
 
+func footprint_width() -> int:
+	return max(1, footprint_width_cells)
+
+
+func footprint_height() -> int:
+	return max(1, footprint_height_cells)
+
+
+func footprint_cells(anchor_cell: Vector2i = cell) -> Array[Vector2i]:
+	var cells: Array[Vector2i] = []
+	var width: int = footprint_width()
+	var height: int = footprint_height()
+	var left: int = anchor_cell.x - int(floor(width / 2.0))
+	var top: int = anchor_cell.y - (height - 1)
+	for y in range(top, top + height):
+		for x in range(left, left + width):
+			cells.append(Vector2i(x, y))
+	return cells
+
+
+func footprint_contains_cell(check_cell: Vector2i, anchor_cell: Vector2i = cell) -> bool:
+	return footprint_cells(anchor_cell).has(check_cell)
+
+
 func _exit_tree() -> void:
 	if ghost_mode:
 		return
-	var pg := get_node_or_null("/root/PowerGrid")
+	var pg: Node = get_node_or_null("/root/PowerGrid")
 	if pg:
 		if is_pipe:
 			pg.unregister_pipe(self)
@@ -113,7 +141,7 @@ func _register_with_grid() -> void:
 	if not is_inside_tree() or ghost_mode:
 		return
 	refresh_cell_from_position()
-	var pg := get_node_or_null("/root/PowerGrid")
+	var pg: Node = get_node_or_null("/root/PowerGrid")
 	if pg:
 		if is_pipe:
 			pg.register_pipe(self)
@@ -132,7 +160,7 @@ func set_direction(d: int) -> void:
 	apply_direction_animation()
 	if ghost_mode:
 		return
-	var pg := get_node_or_null("/root/PowerGrid")
+	var pg: Node = get_node_or_null("/root/PowerGrid")
 	if pg:
 		pg.mark_dirty()
 
@@ -154,11 +182,11 @@ func apply_direction_animation() -> void:
 			var name_lower: String = c.name.to_lower()
 			if name_lower == dir_name:
 				c.visible = true
-				c.play()
+				_resume_sprite(c as AnimatedSprite2D)
 				found_match = true
 			else:
 				c.visible = false
-				c.stop()
+				_pause_sprite(c as AnimatedSprite2D)
 	if not found_match:
 		_apply_anim_for_direction(self, direction)
 
@@ -181,33 +209,50 @@ func _update_animation_playback() -> void:
 	_set_animation_playing(self, true, _power_ratio)
 
 
-static func _set_animation_playing(node: Node, playing: bool, ratio: float = 1.0) -> void:
+func _set_animation_playing(node: Node, playing: bool, ratio: float = 1.0) -> void:
 	for c in node.get_children():
 		if c is AnimatedSprite2D:
-			var s := c as AnimatedSprite2D
+			var s: AnimatedSprite2D = c as AnimatedSprite2D
 			if not s.visible or s.sprite_frames == null:
 				continue
 			if playing:
-				var target_fps: float = lerp(5.0, 24.0, clampf(ratio, 0.0, 1.0))
+				var target_fps: float = lerp(animation_min_fps, animation_max_fps, clampf(ratio, 0.0, 1.0))
 				var base_fps: float = s.sprite_frames.get_animation_speed(s.animation)
 				if base_fps <= 0.0:
-					base_fps = 24.0
+					base_fps = maxf(animation_max_fps, 0.001)
 				s.speed_scale = target_fps / base_fps
-				s.play()
+				_resume_sprite(s)
 			else:
 				s.speed_scale = 1.0
-				s.stop()
+				_pause_sprite(s)
 		elif c.get_child_count() > 0:
 			_set_animation_playing(c, playing, ratio)
 
 
 static func _apply_anim_for_direction(node: Node, d: int) -> void:
 	if node is AnimatedSprite2D:
-		var s := node as AnimatedSprite2D
+		var s: AnimatedSprite2D = node as AnimatedSprite2D
 		if s.sprite_frames:
 			for anim_name in ANIM_FALLBACKS.get(d, ["default"]):
 				if s.sprite_frames.has_animation(anim_name):
-					s.play(anim_name)
+					if s.animation == anim_name:
+						_resume_sprite(s)
+					else:
+						s.play(anim_name)
 					break
 	for c in node.get_children():
 		_apply_anim_for_direction(c, d)
+
+
+static func _resume_sprite(sprite: AnimatedSprite2D) -> void:
+	if sprite == null:
+		return
+	if not sprite.is_playing():
+		sprite.play()
+
+
+static func _pause_sprite(sprite: AnimatedSprite2D) -> void:
+	if sprite == null:
+		return
+	if sprite.is_playing():
+		sprite.pause()

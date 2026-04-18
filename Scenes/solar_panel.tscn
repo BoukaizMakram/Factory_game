@@ -15,7 +15,7 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_555cn"]
-size = Vector2(20, 8.820404)
+size = Vector2(14.133901, 8.820404)
 
 [node name="Solar Panel" type="Node2D" unique_id=1947233187]
 z_index = 5
@@ -26,24 +26,28 @@ watts_produced = 5.0
 ignore_pipe_direction = true
 
 [node name="up" type="AnimatedSprite2D" parent="." unique_id=1686358345]
+z_index = 5
 sprite_frames = SubResource("SpriteFrames_ennlc")
 animation = &"left"
 
 [node name="down" type="AnimatedSprite2D" parent="." unique_id=1918953285]
+z_index = 5
 sprite_frames = SubResource("SpriteFrames_ennlc")
 animation = &"left"
 
 [node name="left" type="AnimatedSprite2D" parent="." unique_id=1924027339]
+z_index = 5
 sprite_frames = SubResource("SpriteFrames_ennlc")
 animation = &"left"
 
 [node name="right" type="AnimatedSprite2D" parent="." unique_id=2147443300]
+z_index = 5
 sprite_frames = SubResource("SpriteFrames_ennlc")
 animation = &"left"
 
 [node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=789759618]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D" unique_id=412964171]
-position = Vector2(0, -3.499998)
+position = Vector2(-0.500002, -3.499998)
 scale = Vector2(9.41, 9.41)
 shape = SubResource("RectangleShape2D_555cn")
