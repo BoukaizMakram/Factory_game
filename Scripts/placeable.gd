@@ -56,6 +56,8 @@ const ANIM_FALLBACKS: Dictionary = {
 	Dir.DOWN: ["down", "Rotated"],
 }
 
+const DIRECTION_ORDER: Array[int] = [Dir.UP, Dir.RIGHT, Dir.DOWN, Dir.LEFT]
+
 
 static func opposite(d: int) -> int:
 	match d:
@@ -80,6 +82,7 @@ func opposite_direction() -> int:
 
 func _ready() -> void:
 	_resolve_cell_span()
+	direction = normalize_direction_for_available(direction)
 	if ghost_mode:
 		apply_direction_animation()
 		return
@@ -154,6 +157,7 @@ func refresh_cell_from_position() -> void:
 
 
 func set_direction(d: int) -> void:
+	d = normalize_direction_for_available(d)
 	if d == direction:
 		return
 	direction = d
@@ -175,8 +179,10 @@ func set_powered(p: bool, power_ratio: float = 1.0) -> void:
 
 
 func apply_direction_animation() -> void:
+	direction = normalize_direction_for_available(direction)
 	var dir_name: String = direction_name(direction)
 	var found_match: bool = false
+	var has_direction_children: bool = _has_direction_child_sprite(self)
 	for c in get_children():
 		if c is AnimatedSprite2D:
 			var name_lower: String = c.name.to_lower()
@@ -184,11 +190,90 @@ func apply_direction_animation() -> void:
 				c.visible = true
 				_resume_sprite(c as AnimatedSprite2D)
 				found_match = true
-			else:
+			elif has_direction_children and _direction_from_name(name_lower) >= 0:
 				c.visible = false
 				_pause_sprite(c as AnimatedSprite2D)
 	if not found_match:
 		_apply_anim_for_direction(self, direction)
+
+
+func normalize_direction_for_available(d: int) -> int:
+	var available: Array[int] = available_directions()
+	if available.is_empty() or available.has(d):
+		return d
+	return available[0]
+
+
+func next_available_direction(from_direction: int) -> int:
+	var available: Array[int] = available_directions_ordered(DIRECTION_ORDER)
+	if available.is_empty():
+		return from_direction
+	var start_idx: int = available.find(from_direction)
+	if start_idx < 0:
+		return available[0]
+	return available[(start_idx + 1) % available.size()]
+
+
+func available_directions_ordered(order: Array[int]) -> Array[int]:
+	var available: Array[int] = available_directions()
+	var ordered: Array[int] = []
+	for d in order:
+		if available.has(d):
+			ordered.append(d)
+	return ordered
+
+
+func available_directions() -> Array[int]:
+	var directions: Array[int] = []
+	_collect_direction_child_sprites(self, directions)
+	if not directions.is_empty():
+		return directions
+	_collect_direction_animations(self, directions)
+	if not directions.is_empty():
+		return directions
+	return [direction]
+
+
+static func _collect_direction_child_sprites(node: Node, out: Array[int]) -> void:
+	if node is AnimatedSprite2D:
+		var d: int = _direction_from_name(node.name.to_lower())
+		if d >= 0 and not out.has(d):
+			out.append(d)
+	for child in node.get_children():
+		_collect_direction_child_sprites(child, out)
+
+
+static func _collect_direction_animations(node: Node, out: Array[int]) -> void:
+	if node is AnimatedSprite2D:
+		var sprite: AnimatedSprite2D = node as AnimatedSprite2D
+		if sprite.sprite_frames != null:
+			for d in DIRECTION_ORDER:
+				if sprite.sprite_frames.has_animation(direction_name(d)) and not out.has(d):
+					out.append(d)
+	for child in node.get_children():
+		_collect_direction_animations(child, out)
+
+
+static func _has_direction_child_sprite(node: Node) -> bool:
+	if node is AnimatedSprite2D and _direction_from_name(node.name.to_lower()) >= 0:
+		return true
+	for child in node.get_children():
+		if _has_direction_child_sprite(child):
+			return true
+	return false
+
+
+static func _direction_from_name(name_lower: String) -> int:
+	match name_lower:
+		"up":
+			return Dir.UP
+		"right":
+			return Dir.RIGHT
+		"down":
+			return Dir.DOWN
+		"left":
+			return Dir.LEFT
+	return -1
 
 
 func _update_power_tint() -> void:

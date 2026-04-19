@@ -4,7 +4,21 @@
 [ext_resource type="AudioStream" uid="uid://c1013pknllfpw" path="res://SFX/raw/inventory open.wav" id="2_open"]
 [ext_resource type="AudioStream" uid="uid://d1idjswbuw6eo" path="res://SFX/raw/inventory.wav" id="3_close"]
 [ext_resource type="Script" uid="uid://dtnis1rsvhhp4" path="res://Scripts/hotbar_ui.gd" id="4_hotbar_ui"]
+[ext_resource type="Texture2D" uid="uid://djvuknalblmh7" path="res://UI/textures/close.png" id="5_m78vo"]
 [ext_resource type="Script" uid="uid://cmxvoxkukfqwf" path="res://Scripts/ui.gd" id="5_ui_logic"]
+[ext_resource type="Script" uid="uid://dn8c60qp8ctim" path="res://Scripts/debug_console.gd" id="6_debug_console"]
+[ext_resource type="Script" uid="uid://bgtob0bc5yffd" path="res://Scripts/pause_menu.gd" id="7_pause_menu"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_slot_normal"]
+bg_color = Color(0, 0, 0, 0.35)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_slot_pressed"]
+bg_color = Color(0.1880908, 0.24808669, 0.29258862, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_slot_hover"]
+bg_color = Color(0, 0, 0, 0.5)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_q7pk6"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_hud"]
 font_size = 39
@@ -14,17 +28,17 @@ script = ExtResource("5_ui_logic")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1513568769]
 
-[node name="InventoryUI" type="Control" parent="CanvasLayer" unique_id=926867665 node_paths=PackedStringArray("inventory_holder_path")]
+[node name="InventoryUI" type="Control" parent="CanvasLayer" unique_id=926867665]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 1
 script = ExtResource("1_inventory_ui")
 open_sound = ExtResource("2_open")
 close_sound = ExtResource("3_close")
-inventory_holder_path = NodePath("../../../PlayerInventory")
 
 [node name="Backdrop" type="ColorRect" parent="CanvasLayer/InventoryUI" unique_id=878769519]
 layout_mode = 1
@@ -33,43 +47,62 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.02, 0.025, 0.025, 0.78)
+mouse_filter = 2
+color = Color(0.08292615, 0.10039567, 0.10039512, 0.5019608)
 
 [node name="Title" type="Label" parent="CanvasLayer/InventoryUI" unique_id=148651513]
 layout_mode = 0
-offset_left = 220.0
-offset_top = 95.0
-offset_right = 820.0
-offset_bottom = 165.0
+offset_left = 625.0
+offset_top = 391.0
+offset_right = 1225.0
+offset_bottom = 461.0
+scale = Vector2(0.6755811, 0.6755811)
+theme_override_font_sizes/font_size = 50
 text = "INVENTORY"
 
 [node name="Close" type="Button" parent="CanvasLayer/InventoryUI" unique_id=1551414343]
 layout_mode = 0
-offset_left = 1772.0
-offset_top = 36.0
-offset_right = 1898.0
-offset_bottom = 162.0
+offset_left = 1822.0
+offset_top = 45.99994
+offset_right = 1948.0
+offset_bottom = 171.99994
+scale = Vector2(0.43720928, 0.43720928)
 theme_override_font_sizes/font_size = 30
-text = "X"
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+icon = ExtResource("5_m78vo")
+icon_alignment = 1
 
 [node name="Panel" type="Panel" parent="CanvasLayer/InventoryUI" unique_id=1940742575]
 layout_mode = 0
-offset_left = 220.0
-offset_top = 150.0
-offset_right = 1730.0
-offset_bottom = 955.0
+offset_left = 540.0
+offset_top = 417.0
+offset_right = 1380.0
+offset_bottom = 943.0
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxEmpty_q7pk6")
 
 [node name="Grid" type="GridContainer" parent="CanvasLayer/InventoryUI/Panel" unique_id=752843851]
 layout_mode = 0
-offset_left = 325.0
-offset_top = 74.0
-offset_right = 1185.0
-offset_bottom = 731.0
+offset_left = 84.0
+offset_top = 28.0
+offset_right = 756.0
+offset_bottom = 476.0
+scale = Vector2(1.1672823, 1.1672823)
 columns = 6
 
 [node name="SlotTemplate" type="Button" parent="CanvasLayer/InventoryUI/Panel/Grid" unique_id=349802315]
+visible = false
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
 
 [node name="Selected" type="ColorRect" parent="CanvasLayer/InventoryUI/Panel/Grid/SlotTemplate" unique_id=1708470995]
 visible = false
@@ -101,22 +134,1805 @@ offset_bottom = 94.0
 horizontal_alignment = 2
 vertical_alignment = 2
 
-[node name="HotbarUI" type="Control" parent="CanvasLayer" unique_id=725148772 node_paths=PackedStringArray("inventory_holder_path")]
+[node name="Slot0" type="Button" parent="CanvasLayer/InventoryUI/Panel/Grid" unique_id=332653270]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+
+[node name="Selected" type="ColorRect" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot0" unique_id=786220998]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0.18)
+
+[node name="Icon" type="TextureRect" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot0" unique_id=1999673533]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 6.0
+offset_right = 88.0
+offset_bottom = 86.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Amount" type="Label" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot0" unique_id=1679835511]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 62.0
+offset_right = 88.0
+offset_bottom = 94.0
+horizontal_alignment = 2
+vertical_alignment = 2
+
+[node name="Slot1" type="Button" parent="CanvasLayer/InventoryUI/Panel/Grid" unique_id=161886656]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+
+[node name="Selected" type="ColorRect" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot1" unique_id=832209443]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0.18)
+
+[node name="Icon" type="TextureRect" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot1" unique_id=278404165]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 6.0
+offset_right = 88.0
+offset_bottom = 86.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Amount" type="Label" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot1" unique_id=511953299]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 62.0
+offset_right = 88.0
+offset_bottom = 94.0
+horizontal_alignment = 2
+vertical_alignment = 2
+
+[node name="Slot2" type="Button" parent="CanvasLayer/InventoryUI/Panel/Grid" unique_id=740852224]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+
+[node name="Selected" type="ColorRect" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot2" unique_id=794360064]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0.18)
+
+[node name="Icon" type="TextureRect" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot2" unique_id=1289930822]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 6.0
+offset_right = 88.0
+offset_bottom = 86.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Amount" type="Label" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot2" unique_id=1424739977]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 62.0
+offset_right = 88.0
+offset_bottom = 94.0
+horizontal_alignment = 2
+vertical_alignment = 2
+
+[node name="Slot3" type="Button" parent="CanvasLayer/InventoryUI/Panel/Grid" unique_id=851246555]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+
+[node name="Selected" type="ColorRect" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot3" unique_id=175514463]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0.18)
+
+[node name="Icon" type="TextureRect" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot3" unique_id=796853400]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 6.0
+offset_right = 88.0
+offset_bottom = 86.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Amount" type="Label" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot3" unique_id=1507165192]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 62.0
+offset_right = 88.0
+offset_bottom = 94.0
+horizontal_alignment = 2
+vertical_alignment = 2
+
+[node name="Slot4" type="Button" parent="CanvasLayer/InventoryUI/Panel/Grid" unique_id=515145219]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+
+[node name="Selected" type="ColorRect" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot4" unique_id=2102587048]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0.18)
+
+[node name="Icon" type="TextureRect" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot4" unique_id=517336869]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 6.0
+offset_right = 88.0
+offset_bottom = 86.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Amount" type="Label" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot4" unique_id=1204902510]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 62.0
+offset_right = 88.0
+offset_bottom = 94.0
+horizontal_alignment = 2
+vertical_alignment = 2
+
+[node name="Slot5" type="Button" parent="CanvasLayer/InventoryUI/Panel/Grid" unique_id=1852751118]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+
+[node name="Selected" type="ColorRect" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot5" unique_id=1243349779]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0.18)
+
+[node name="Icon" type="TextureRect" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot5" unique_id=310973659]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 6.0
+offset_right = 88.0
+offset_bottom = 86.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Amount" type="Label" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot5" unique_id=259333503]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 62.0
+offset_right = 88.0
+offset_bottom = 94.0
+horizontal_alignment = 2
+vertical_alignment = 2
+
+[node name="Slot6" type="Button" parent="CanvasLayer/InventoryUI/Panel/Grid" unique_id=414694689]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+
+[node name="Selected" type="ColorRect" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot6" unique_id=978197537]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0.18)
+
+[node name="Icon" type="TextureRect" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot6" unique_id=134681625]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 6.0
+offset_right = 88.0
+offset_bottom = 86.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Amount" type="Label" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot6" unique_id=1884413811]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 62.0
+offset_right = 88.0
+offset_bottom = 94.0
+horizontal_alignment = 2
+vertical_alignment = 2
+
+[node name="Slot7" type="Button" parent="CanvasLayer/InventoryUI/Panel/Grid" unique_id=1133338613]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+
+[node name="Selected" type="ColorRect" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot7" unique_id=1617914285]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0.18)
+
+[node name="Icon" type="TextureRect" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot7" unique_id=1005889672]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 6.0
+offset_right = 88.0
+offset_bottom = 86.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Amount" type="Label" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot7" unique_id=1263942150]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 62.0
+offset_right = 88.0
+offset_bottom = 94.0
+horizontal_alignment = 2
+vertical_alignment = 2
+
+[node name="Slot8" type="Button" parent="CanvasLayer/InventoryUI/Panel/Grid" unique_id=1655826875]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+
+[node name="Selected" type="ColorRect" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot8" unique_id=1131362542]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0.18)
+
+[node name="Icon" type="TextureRect" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot8" unique_id=1200639709]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 6.0
+offset_right = 88.0
+offset_bottom = 86.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Amount" type="Label" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot8" unique_id=183552293]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 62.0
+offset_right = 88.0
+offset_bottom = 94.0
+horizontal_alignment = 2
+vertical_alignment = 2
+
+[node name="Slot9" type="Button" parent="CanvasLayer/InventoryUI/Panel/Grid" unique_id=1912760317]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+
+[node name="Selected" type="ColorRect" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot9" unique_id=742807033]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0.18)
+
+[node name="Icon" type="TextureRect" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot9" unique_id=2108925061]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 6.0
+offset_right = 88.0
+offset_bottom = 86.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Amount" type="Label" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot9" unique_id=21327142]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 62.0
+offset_right = 88.0
+offset_bottom = 94.0
+horizontal_alignment = 2
+vertical_alignment = 2
+
+[node name="Slot10" type="Button" parent="CanvasLayer/InventoryUI/Panel/Grid" unique_id=1870276779]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+
+[node name="Selected" type="ColorRect" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot10" unique_id=66976880]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0.18)
+
+[node name="Icon" type="TextureRect" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot10" unique_id=1443063013]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 6.0
+offset_right = 88.0
+offset_bottom = 86.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Amount" type="Label" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot10" unique_id=1833406046]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 62.0
+offset_right = 88.0
+offset_bottom = 94.0
+horizontal_alignment = 2
+vertical_alignment = 2
+
+[node name="Slot11" type="Button" parent="CanvasLayer/InventoryUI/Panel/Grid" unique_id=1071322650]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+
+[node name="Selected" type="ColorRect" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot11" unique_id=1684221541]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0.18)
+
+[node name="Icon" type="TextureRect" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot11" unique_id=2020846592]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 6.0
+offset_right = 88.0
+offset_bottom = 86.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Amount" type="Label" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot11" unique_id=1138554717]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 62.0
+offset_right = 88.0
+offset_bottom = 94.0
+horizontal_alignment = 2
+vertical_alignment = 2
+
+[node name="Slot12" type="Button" parent="CanvasLayer/InventoryUI/Panel/Grid" unique_id=1531977254]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+
+[node name="Selected" type="ColorRect" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot12" unique_id=283865340]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0.18)
+
+[node name="Icon" type="TextureRect" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot12" unique_id=385422569]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 6.0
+offset_right = 88.0
+offset_bottom = 86.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Amount" type="Label" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot12" unique_id=1635006061]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 62.0
+offset_right = 88.0
+offset_bottom = 94.0
+horizontal_alignment = 2
+vertical_alignment = 2
+
+[node name="Slot13" type="Button" parent="CanvasLayer/InventoryUI/Panel/Grid" unique_id=940071763]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+
+[node name="Selected" type="ColorRect" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot13" unique_id=1643272086]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0.18)
+
+[node name="Icon" type="TextureRect" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot13" unique_id=2034196935]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 6.0
+offset_right = 88.0
+offset_bottom = 86.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Amount" type="Label" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot13" unique_id=824096085]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 62.0
+offset_right = 88.0
+offset_bottom = 94.0
+horizontal_alignment = 2
+vertical_alignment = 2
+
+[node name="Slot14" type="Button" parent="CanvasLayer/InventoryUI/Panel/Grid" unique_id=477719202]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+
+[node name="Selected" type="ColorRect" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot14" unique_id=300027259]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0.18)
+
+[node name="Icon" type="TextureRect" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot14" unique_id=1280779485]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 6.0
+offset_right = 88.0
+offset_bottom = 86.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Amount" type="Label" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot14" unique_id=933540774]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 62.0
+offset_right = 88.0
+offset_bottom = 94.0
+horizontal_alignment = 2
+vertical_alignment = 2
+
+[node name="Slot15" type="Button" parent="CanvasLayer/InventoryUI/Panel/Grid" unique_id=570814920]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+
+[node name="Selected" type="ColorRect" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot15" unique_id=1326794301]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0.18)
+
+[node name="Icon" type="TextureRect" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot15" unique_id=174005044]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 6.0
+offset_right = 88.0
+offset_bottom = 86.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Amount" type="Label" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot15" unique_id=995225992]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 62.0
+offset_right = 88.0
+offset_bottom = 94.0
+horizontal_alignment = 2
+vertical_alignment = 2
+
+[node name="Slot16" type="Button" parent="CanvasLayer/InventoryUI/Panel/Grid" unique_id=1318558301]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+
+[node name="Selected" type="ColorRect" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot16" unique_id=1336953137]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0.18)
+
+[node name="Icon" type="TextureRect" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot16" unique_id=1230705961]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 6.0
+offset_right = 88.0
+offset_bottom = 86.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Amount" type="Label" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot16" unique_id=11475005]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 62.0
+offset_right = 88.0
+offset_bottom = 94.0
+horizontal_alignment = 2
+vertical_alignment = 2
+
+[node name="Slot17" type="Button" parent="CanvasLayer/InventoryUI/Panel/Grid" unique_id=907189068]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+
+[node name="Selected" type="ColorRect" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot17" unique_id=1382318391]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0.18)
+
+[node name="Icon" type="TextureRect" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot17" unique_id=1998547365]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 6.0
+offset_right = 88.0
+offset_bottom = 86.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Amount" type="Label" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot17" unique_id=932537928]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 62.0
+offset_right = 88.0
+offset_bottom = 94.0
+horizontal_alignment = 2
+vertical_alignment = 2
+
+[node name="Slot18" type="Button" parent="CanvasLayer/InventoryUI/Panel/Grid" unique_id=31828297]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+
+[node name="Selected" type="ColorRect" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot18" unique_id=343839409]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0.18)
+
+[node name="Icon" type="TextureRect" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot18" unique_id=1090053418]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 6.0
+offset_right = 88.0
+offset_bottom = 86.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Amount" type="Label" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot18" unique_id=1234955441]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 62.0
+offset_right = 88.0
+offset_bottom = 94.0
+horizontal_alignment = 2
+vertical_alignment = 2
+
+[node name="Slot19" type="Button" parent="CanvasLayer/InventoryUI/Panel/Grid" unique_id=1933176047]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+
+[node name="Selected" type="ColorRect" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot19" unique_id=1631022051]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0.18)
+
+[node name="Icon" type="TextureRect" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot19" unique_id=1298975613]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 6.0
+offset_right = 88.0
+offset_bottom = 86.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Amount" type="Label" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot19" unique_id=1497456207]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 62.0
+offset_right = 88.0
+offset_bottom = 94.0
+horizontal_alignment = 2
+vertical_alignment = 2
+
+[node name="Slot20" type="Button" parent="CanvasLayer/InventoryUI/Panel/Grid" unique_id=1170846997]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+
+[node name="Selected" type="ColorRect" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot20" unique_id=624422480]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0.18)
+
+[node name="Icon" type="TextureRect" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot20" unique_id=947551707]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 6.0
+offset_right = 88.0
+offset_bottom = 86.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Amount" type="Label" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot20" unique_id=2076809495]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 62.0
+offset_right = 88.0
+offset_bottom = 94.0
+horizontal_alignment = 2
+vertical_alignment = 2
+
+[node name="Slot21" type="Button" parent="CanvasLayer/InventoryUI/Panel/Grid" unique_id=1043090331]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+
+[node name="Selected" type="ColorRect" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot21" unique_id=1156912224]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0.18)
+
+[node name="Icon" type="TextureRect" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot21" unique_id=94529473]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 6.0
+offset_right = 88.0
+offset_bottom = 86.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Amount" type="Label" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot21" unique_id=691852833]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 62.0
+offset_right = 88.0
+offset_bottom = 94.0
+horizontal_alignment = 2
+vertical_alignment = 2
+
+[node name="Slot22" type="Button" parent="CanvasLayer/InventoryUI/Panel/Grid" unique_id=1592078572]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+
+[node name="Selected" type="ColorRect" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot22" unique_id=258917819]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0.18)
+
+[node name="Icon" type="TextureRect" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot22" unique_id=1959028371]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 6.0
+offset_right = 88.0
+offset_bottom = 86.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Amount" type="Label" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot22" unique_id=690361475]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 62.0
+offset_right = 88.0
+offset_bottom = 94.0
+horizontal_alignment = 2
+vertical_alignment = 2
+
+[node name="Slot23" type="Button" parent="CanvasLayer/InventoryUI/Panel/Grid" unique_id=925989978]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+
+[node name="Selected" type="ColorRect" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot23" unique_id=907251261]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0.18)
+
+[node name="Icon" type="TextureRect" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot23" unique_id=1876202621]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 6.0
+offset_right = 88.0
+offset_bottom = 86.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Amount" type="Label" parent="CanvasLayer/InventoryUI/Panel/Grid/Slot23" unique_id=2131449878]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 62.0
+offset_right = 88.0
+offset_bottom = 94.0
+horizontal_alignment = 2
+vertical_alignment = 2
+
+[node name="PauseMenu" type="Control" parent="CanvasLayer" unique_id=438845001]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+script = ExtResource("7_pause_menu")
+open_sound = ExtResource("2_open")
+close_sound = ExtResource("3_close")
+
+[node name="Backdrop" type="ColorRect" parent="CanvasLayer/PauseMenu" unique_id=1857041605]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.08235294, 0.101960786, 0.101960786, 0.5019608)
+
+[node name="Title" type="Label" parent="CanvasLayer/PauseMenu" unique_id=217742309]
+layout_mode = 0
+offset_left = 760.0
+offset_top = 260.0
+offset_right = 1160.0
+offset_bottom = 360.0
+theme_override_font_sizes/font_size = 72
+text = "PAUSED"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Panel" type="Panel" parent="CanvasLayer/PauseMenu" unique_id=1097114154]
+layout_mode = 0
+offset_left = 710.0
+offset_top = 380.0
+offset_right = 1210.0
+offset_bottom = 880.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_slot_pressed")
+
+[node name="Resume" type="Button" parent="CanvasLayer/PauseMenu/Panel" unique_id=1689354051]
+layout_mode = 0
+offset_left = 60.0
+offset_top = 50.0
+offset_right = 440.0
+offset_bottom = 150.0
+theme_override_font_sizes/font_size = 36
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+text = "Resume"
+
+[node name="Settings" type="Button" parent="CanvasLayer/PauseMenu/Panel" unique_id=1689354052]
+layout_mode = 0
+offset_left = 60.0
+offset_top = 190.0
+offset_right = 440.0
+offset_bottom = 290.0
+theme_override_font_sizes/font_size = 36
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+text = "Settings"
+
+[node name="Quit" type="Button" parent="CanvasLayer/PauseMenu/Panel" unique_id=446205380]
+layout_mode = 0
+offset_left = 60.0
+offset_top = 330.0
+offset_right = 440.0
+offset_bottom = 430.0
+theme_override_font_sizes/font_size = 36
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+text = "Quit"
+
+[node name="SettingsPanel" type="Panel" parent="CanvasLayer/PauseMenu" unique_id=1097114155]
+z_index = 10
+layout_mode = 0
+offset_left = -26.261879
+offset_top = -4.999956
+offset_right = 1533.4493
+offset_bottom = 866.6511
+scale = Vector2(1.2608256, 1.2608256)
+theme_override_styles/panel = SubResource("StyleBoxFlat_slot_pressed")
+
+[node name="Title" type="Label" parent="CanvasLayer/PauseMenu/SettingsPanel" unique_id=1519846433]
+layout_mode = 0
+offset_left = 644.23016
+offset_top = 37.277126
+offset_right = 900.6551
+offset_bottom = 93.27713
+pivot_offset = Vector2(127.937744, -6.482462)
+theme_override_font_sizes/font_size = 40
+text = "SETTINGS"
+horizontal_alignment = 1
+
+[node name="ResetButton" type="Button" parent="CanvasLayer/PauseMenu/SettingsPanel" unique_id=1450020929]
+layout_mode = 0
+offset_left = 1115.35
+offset_top = 42.035908
+offset_right = 1335.35
+offset_bottom = 86.035904
+pivot_offset = Vector2(227.62866, 20.621399)
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+text = "Reset to Defaults"
+
+[node name="CloseButton" type="Button" parent="CanvasLayer/PauseMenu/SettingsPanel" unique_id=808461480]
+layout_mode = 0
+offset_left = 690.23175
+offset_top = 783.61346
+offset_right = 883.9993
+offset_bottom = 831.61346
+pivot_offset = Vector2(95.96875, 54.726074)
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+text = "Close"
+
+[node name="Scroll" type="ScrollContainer" parent="CanvasLayer/PauseMenu/SettingsPanel" unique_id=1503736037]
+layout_mode = 0
+offset_left = 172.28113
+offset_top = 80.0
+offset_right = 1355.461
+offset_bottom = 760.0
+pivot_offset = Vector2(1137.1783, 403.80997)
+
+[node name="Content" type="VBoxContainer" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll" unique_id=2027806973]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="AudioHeader" type="Label" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content" unique_id=1241430514]
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "Audio"
+
+[node name="AudioSep" type="HSeparator" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content" unique_id=599003247]
+layout_mode = 2
+
+[node name="MasterRow" type="HBoxContainer" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content" unique_id=1690168464]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Label" type="Label" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/MasterRow" unique_id=285691840]
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Master Volume"
+
+[node name="Slider" type="HSlider" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/MasterRow" unique_id=1546205210]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 1.0
+step = 0.01
+value = 1.0
+
+[node name="Value" type="Label" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/MasterRow" unique_id=1425823913]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "100%"
+horizontal_alignment = 2
+
+[node name="SFXRow" type="HBoxContainer" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content" unique_id=591562479]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Label" type="Label" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/SFXRow" unique_id=1401311898]
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "SFX Volume"
+
+[node name="Slider" type="HSlider" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/SFXRow" unique_id=928344207]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 1.0
+step = 0.01
+value = 1.0
+
+[node name="Value" type="Label" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/SFXRow" unique_id=1514436075]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "100%"
+horizontal_alignment = 2
+
+[node name="MusicRow" type="HBoxContainer" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content" unique_id=440662919]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Label" type="Label" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/MusicRow" unique_id=598217177]
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Music Volume"
+
+[node name="Slider" type="HSlider" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/MusicRow" unique_id=1114539302]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 1.0
+step = 0.01
+value = 1.0
+
+[node name="Value" type="Label" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/MusicRow" unique_id=1222463335]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "100%"
+horizontal_alignment = 2
+
+[node name="VideoHeader" type="Label" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content" unique_id=635626848]
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "Video"
+
+[node name="VideoSep" type="HSeparator" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content" unique_id=273591339]
+layout_mode = 2
+
+[node name="WindowModeRow" type="HBoxContainer" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content" unique_id=1782059538]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Label" type="Label" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/WindowModeRow" unique_id=792407655]
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Window Mode"
+
+[node name="Option" type="OptionButton" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/WindowModeRow" unique_id=1828373952]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+
+[node name="ResolutionRow" type="HBoxContainer" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content" unique_id=781589184]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Label" type="Label" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/ResolutionRow" unique_id=1564855638]
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Resolution"
+
+[node name="Option" type="OptionButton" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/ResolutionRow" unique_id=1697076963]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+
+[node name="VSyncRow" type="HBoxContainer" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content" unique_id=1659471117]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Label" type="Label" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/VSyncRow" unique_id=163825974]
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "VSync"
+
+[node name="Check" type="CheckBox" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/VSyncRow" unique_id=853800063]
+layout_mode = 2
+button_pressed = true
+
+[node name="ControlsHeader" type="Label" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content" unique_id=636613702]
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "Controls"
+
+[node name="ControlsSep" type="HSeparator" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content" unique_id=1017184838]
+layout_mode = 2
+
+[node name="MoveUp" type="HBoxContainer" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content" unique_id=18760729]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Label" type="Label" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/MoveUp" unique_id=363589300]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Move Up"
+
+[node name="Key" type="Button" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/MoveUp" unique_id=325456916]
+custom_minimum_size = Vector2(180, 36)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+text = "W"
+
+[node name="Reset" type="Button" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/MoveUp" unique_id=512249745]
+custom_minimum_size = Vector2(80, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+text = "Reset"
+
+[node name="MoveDown" type="HBoxContainer" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content" unique_id=2137170715]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Label" type="Label" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/MoveDown" unique_id=939822475]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Move Down"
+
+[node name="Key" type="Button" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/MoveDown" unique_id=1281248076]
+custom_minimum_size = Vector2(180, 36)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+text = "S"
+
+[node name="Reset" type="Button" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/MoveDown" unique_id=1554654751]
+custom_minimum_size = Vector2(80, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+text = "Reset"
+
+[node name="MoveLeft" type="HBoxContainer" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content" unique_id=1657825984]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Label" type="Label" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/MoveLeft" unique_id=1439131456]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Move Left"
+
+[node name="Key" type="Button" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/MoveLeft" unique_id=2065884659]
+custom_minimum_size = Vector2(180, 36)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+text = "A"
+
+[node name="Reset" type="Button" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/MoveLeft" unique_id=2086091281]
+custom_minimum_size = Vector2(80, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+text = "Reset"
+
+[node name="MoveRight" type="HBoxContainer" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content" unique_id=1374362499]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Label" type="Label" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/MoveRight" unique_id=1353525163]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Move Right"
+
+[node name="Key" type="Button" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/MoveRight" unique_id=1462384727]
+custom_minimum_size = Vector2(180, 36)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+text = "D"
+
+[node name="Reset" type="Button" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/MoveRight" unique_id=1313714052]
+custom_minimum_size = Vector2(80, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+text = "Reset"
+
+[node name="Inventory" type="HBoxContainer" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content" unique_id=1637135663]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Label" type="Label" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/Inventory" unique_id=1037653]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Inventory"
+
+[node name="Key" type="Button" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/Inventory" unique_id=1935256719]
+custom_minimum_size = Vector2(180, 36)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+text = "E"
+
+[node name="Reset" type="Button" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/Inventory" unique_id=400803419]
+custom_minimum_size = Vector2(80, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+text = "Reset"
+
+[node name="Pause" type="HBoxContainer" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content" unique_id=1419849769]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Label" type="Label" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/Pause" unique_id=170771397]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Pause"
+
+[node name="Key" type="Button" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/Pause" unique_id=189482440]
+custom_minimum_size = Vector2(180, 36)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+text = "Escape"
+
+[node name="Reset" type="Button" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/Pause" unique_id=859231851]
+custom_minimum_size = Vector2(80, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+text = "Reset"
+
+[node name="DebugConsole" type="HBoxContainer" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content" unique_id=1779906794]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Label" type="Label" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/DebugConsole" unique_id=1772166185]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Debug Console"
+
+[node name="Key" type="Button" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/DebugConsole" unique_id=1932638799]
+custom_minimum_size = Vector2(180, 36)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+text = "F1"
+
+[node name="Reset" type="Button" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/DebugConsole" unique_id=1184463219]
+custom_minimum_size = Vector2(80, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+text = "Reset"
+
+[node name="PlacerCancel" type="HBoxContainer" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content" unique_id=2107309492]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Label" type="Label" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/PlacerCancel" unique_id=1261909368]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Cancel Placement"
+
+[node name="Key" type="Button" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/PlacerCancel" unique_id=1333377836]
+custom_minimum_size = Vector2(180, 36)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+text = "Q"
+
+[node name="Reset" type="Button" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/PlacerCancel" unique_id=215269440]
+custom_minimum_size = Vector2(80, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+text = "Reset"
+
+[node name="PlacerRotate" type="HBoxContainer" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content" unique_id=1927491879]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Label" type="Label" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/PlacerRotate" unique_id=543391102]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Rotate"
+
+[node name="Key" type="Button" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/PlacerRotate" unique_id=1292366247]
+custom_minimum_size = Vector2(180, 36)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+text = "R"
+
+[node name="Reset" type="Button" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/PlacerRotate" unique_id=468561948]
+custom_minimum_size = Vector2(80, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+text = "Reset"
+
+[node name="PlacerPipeCross" type="HBoxContainer" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content" unique_id=1278285159]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Label" type="Label" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/PlacerPipeCross" unique_id=160503656]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Pipe Crossing"
+
+[node name="Key" type="Button" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/PlacerPipeCross" unique_id=22760042]
+custom_minimum_size = Vector2(180, 36)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+text = "T"
+
+[node name="Reset" type="Button" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/PlacerPipeCross" unique_id=2009989523]
+custom_minimum_size = Vector2(80, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+text = "Reset"
+
+[node name="PlacerToggleGrid" type="HBoxContainer" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content" unique_id=482833062]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Label" type="Label" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/PlacerToggleGrid" unique_id=1142826315]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Toggle Grid"
+
+[node name="Key" type="Button" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/PlacerToggleGrid" unique_id=1338237557]
+custom_minimum_size = Vector2(180, 36)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+text = "G"
+
+[node name="Reset" type="Button" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/PlacerToggleGrid" unique_id=2014438399]
+custom_minimum_size = Vector2(80, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+text = "Reset"
+
+[node name="PlacerInspect" type="HBoxContainer" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content" unique_id=873883400]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Label" type="Label" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/PlacerInspect" unique_id=1513515939]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Inspect Pipes"
+
+[node name="Key" type="Button" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/PlacerInspect" unique_id=784941537]
+custom_minimum_size = Vector2(180, 36)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+text = "Alt"
+
+[node name="Reset" type="Button" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/PlacerInspect" unique_id=1730202790]
+custom_minimum_size = Vector2(80, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+text = "Reset"
+
+[node name="Hotbar1" type="HBoxContainer" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content" unique_id=1839107571]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Label" type="Label" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/Hotbar1" unique_id=983130913]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Hotbar 1"
+
+[node name="Key" type="Button" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/Hotbar1" unique_id=179917884]
+custom_minimum_size = Vector2(180, 36)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+text = "1"
+
+[node name="Reset" type="Button" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/Hotbar1" unique_id=1313257127]
+custom_minimum_size = Vector2(80, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+text = "Reset"
+
+[node name="Hotbar2" type="HBoxContainer" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content" unique_id=1619473012]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Label" type="Label" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/Hotbar2" unique_id=219290620]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Hotbar 2"
+
+[node name="Key" type="Button" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/Hotbar2" unique_id=1505419586]
+custom_minimum_size = Vector2(180, 36)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+text = "2"
+
+[node name="Reset" type="Button" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/Hotbar2" unique_id=1108914952]
+custom_minimum_size = Vector2(80, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+text = "Reset"
+
+[node name="Hotbar3" type="HBoxContainer" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content" unique_id=1281571345]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Label" type="Label" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/Hotbar3" unique_id=816898250]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Hotbar 3"
+
+[node name="Key" type="Button" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/Hotbar3" unique_id=1655189487]
+custom_minimum_size = Vector2(180, 36)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+text = "3"
+
+[node name="Reset" type="Button" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/Hotbar3" unique_id=2109247190]
+custom_minimum_size = Vector2(80, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+text = "Reset"
+
+[node name="Hotbar4" type="HBoxContainer" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content" unique_id=1705546705]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Label" type="Label" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/Hotbar4" unique_id=1733258753]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Hotbar 4"
+
+[node name="Key" type="Button" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/Hotbar4" unique_id=605587936]
+custom_minimum_size = Vector2(180, 36)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+text = "4"
+
+[node name="Reset" type="Button" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/Hotbar4" unique_id=451789924]
+custom_minimum_size = Vector2(80, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+text = "Reset"
+
+[node name="Hotbar5" type="HBoxContainer" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content" unique_id=1821106939]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Label" type="Label" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/Hotbar5" unique_id=2080860602]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Hotbar 5"
+
+[node name="Key" type="Button" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/Hotbar5" unique_id=2047753720]
+custom_minimum_size = Vector2(180, 36)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+text = "5"
+
+[node name="Reset" type="Button" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/Hotbar5" unique_id=1204884143]
+custom_minimum_size = Vector2(80, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+text = "Reset"
+
+[node name="Hotbar6" type="HBoxContainer" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content" unique_id=715506794]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Label" type="Label" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/Hotbar6" unique_id=1804062607]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Hotbar 6"
+
+[node name="Key" type="Button" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/Hotbar6" unique_id=922057777]
+custom_minimum_size = Vector2(180, 36)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+text = "6"
+
+[node name="Reset" type="Button" parent="CanvasLayer/PauseMenu/SettingsPanel/Scroll/Content/Hotbar6" unique_id=953656313]
+custom_minimum_size = Vector2(80, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+text = "Reset"
+
+[node name="HotbarUI" type="Control" parent="CanvasLayer" unique_id=725148772]
 layout_mode = 3
 anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -520.0
-offset_top = -122.0
-offset_right = 520.0
-offset_bottom = -20.0
+offset_left = -323.0
+offset_top = -126.00006
+offset_right = 181.0
+offset_bottom = -39.528076
 grow_horizontal = 2
 grow_vertical = 0
+scale = Vector2(1.3414768, 1.3414768)
 mouse_filter = 1
 script = ExtResource("4_hotbar_ui")
-inventory_holder_path = NodePath("../../../PlayerInventory")
 
 [node name="Grid" type="GridContainer" parent="CanvasLayer/HotbarUI" unique_id=1990323179]
 layout_mode = 1
@@ -125,11 +1941,17 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-columns = 10
+columns = 6
 
 [node name="SlotTemplate" type="Button" parent="CanvasLayer/HotbarUI/Grid" unique_id=526259051]
+visible = false
 custom_minimum_size = Vector2(84, 84)
 layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
 
 [node name="Selected" type="ColorRect" parent="CanvasLayer/HotbarUI/Grid/SlotTemplate" unique_id=18792218]
 visible = false
@@ -153,6 +1975,240 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="Amount" type="Label" parent="CanvasLayer/HotbarUI/Grid/SlotTemplate" unique_id=1815119088]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 52.0
+offset_right = 76.0
+offset_bottom = 82.0
+horizontal_alignment = 2
+vertical_alignment = 2
+
+[node name="Slot0" type="Button" parent="CanvasLayer/HotbarUI/Grid" unique_id=885628618]
+custom_minimum_size = Vector2(84, 84)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+
+[node name="Selected" type="ColorRect" parent="CanvasLayer/HotbarUI/Grid/Slot0" unique_id=1642655002]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0.18)
+
+[node name="Icon" type="TextureRect" parent="CanvasLayer/HotbarUI/Grid/Slot0" unique_id=349831110]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 6.0
+offset_right = 76.0
+offset_bottom = 74.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Amount" type="Label" parent="CanvasLayer/HotbarUI/Grid/Slot0" unique_id=537596573]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 52.0
+offset_right = 76.0
+offset_bottom = 82.0
+horizontal_alignment = 2
+vertical_alignment = 2
+
+[node name="Slot1" type="Button" parent="CanvasLayer/HotbarUI/Grid" unique_id=1063581807]
+custom_minimum_size = Vector2(84, 84)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+
+[node name="Selected" type="ColorRect" parent="CanvasLayer/HotbarUI/Grid/Slot1" unique_id=983236473]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0.18)
+
+[node name="Icon" type="TextureRect" parent="CanvasLayer/HotbarUI/Grid/Slot1" unique_id=152584526]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 6.0
+offset_right = 76.0
+offset_bottom = 74.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Amount" type="Label" parent="CanvasLayer/HotbarUI/Grid/Slot1" unique_id=519259331]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 52.0
+offset_right = 76.0
+offset_bottom = 82.0
+horizontal_alignment = 2
+vertical_alignment = 2
+
+[node name="Slot2" type="Button" parent="CanvasLayer/HotbarUI/Grid" unique_id=445739213]
+custom_minimum_size = Vector2(84, 84)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+
+[node name="Selected" type="ColorRect" parent="CanvasLayer/HotbarUI/Grid/Slot2" unique_id=1812719823]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0.18)
+
+[node name="Icon" type="TextureRect" parent="CanvasLayer/HotbarUI/Grid/Slot2" unique_id=837671685]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 6.0
+offset_right = 76.0
+offset_bottom = 74.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Amount" type="Label" parent="CanvasLayer/HotbarUI/Grid/Slot2" unique_id=1848573235]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 52.0
+offset_right = 76.0
+offset_bottom = 82.0
+horizontal_alignment = 2
+vertical_alignment = 2
+
+[node name="Slot3" type="Button" parent="CanvasLayer/HotbarUI/Grid" unique_id=107711748]
+custom_minimum_size = Vector2(84, 84)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+
+[node name="Selected" type="ColorRect" parent="CanvasLayer/HotbarUI/Grid/Slot3" unique_id=524110368]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0.18)
+
+[node name="Icon" type="TextureRect" parent="CanvasLayer/HotbarUI/Grid/Slot3" unique_id=1099489080]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 6.0
+offset_right = 76.0
+offset_bottom = 74.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Amount" type="Label" parent="CanvasLayer/HotbarUI/Grid/Slot3" unique_id=1572820387]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 52.0
+offset_right = 76.0
+offset_bottom = 82.0
+horizontal_alignment = 2
+vertical_alignment = 2
+
+[node name="Slot4" type="Button" parent="CanvasLayer/HotbarUI/Grid" unique_id=590469942]
+custom_minimum_size = Vector2(84, 84)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+
+[node name="Selected" type="ColorRect" parent="CanvasLayer/HotbarUI/Grid/Slot4" unique_id=831782624]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0.18)
+
+[node name="Icon" type="TextureRect" parent="CanvasLayer/HotbarUI/Grid/Slot4" unique_id=1554048258]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 6.0
+offset_right = 76.0
+offset_bottom = 74.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Amount" type="Label" parent="CanvasLayer/HotbarUI/Grid/Slot4" unique_id=1125905605]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 52.0
+offset_right = 76.0
+offset_bottom = 82.0
+horizontal_alignment = 2
+vertical_alignment = 2
+
+[node name="Slot5" type="Button" parent="CanvasLayer/HotbarUI/Grid" unique_id=1295942966]
+custom_minimum_size = Vector2(84, 84)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_slot_normal")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q7pk6")
+
+[node name="Selected" type="ColorRect" parent="CanvasLayer/HotbarUI/Grid/Slot5" unique_id=21616800]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0.18)
+
+[node name="Icon" type="TextureRect" parent="CanvasLayer/HotbarUI/Grid/Slot5" unique_id=280328336]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 6.0
+offset_right = 76.0
+offset_bottom = 74.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Amount" type="Label" parent="CanvasLayer/HotbarUI/Grid/Slot5" unique_id=2048304979]
 layout_mode = 0
 offset_left = 4.0
 offset_top = 52.0
@@ -196,3 +2252,72 @@ offset_right = 1426.0
 offset_bottom = -147.7785
 text = "Count: 0	"
 label_settings = SubResource("LabelSettings_hud")
+
+[node name="CursorLayer" type="CanvasLayer" parent="." unique_id=1010241105]
+layer = 100
+
+[node name="HoverItemLabel" type="Label" parent="CursorLayer" unique_id=1383399613]
+visible = false
+z_as_relative = false
+offset_right = 180.0
+offset_bottom = 28.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 20
+text = "Item"
+
+[node name="CursorItemIcon" type="TextureRect" parent="CursorLayer" unique_id=1409312036]
+visible = false
+z_as_relative = false
+offset_right = 48.0
+offset_bottom = 48.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="DebugConsole" type="Control" parent="CursorLayer" unique_id=1857193316]
+visible = false
+z_as_relative = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("6_debug_console")
+
+[node name="Panel" type="Panel" parent="CursorLayer/DebugConsole" unique_id=1988152185]
+layout_mode = 0
+offset_left = 80.0
+offset_top = 80.0
+offset_right = 1040.0
+offset_bottom = 620.0
+
+[node name="Title" type="Label" parent="CursorLayer/DebugConsole/Panel" unique_id=1534714511]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 12.0
+offset_right = 640.0
+offset_bottom = 42.0
+theme_override_font_sizes/font_size = 22
+text = "DEBUG CONSOLE"
+
+[node name="Log" type="RichTextLabel" parent="CursorLayer/DebugConsole/Panel" unique_id=1010161804]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 52.0
+offset_right = 942.0
+offset_bottom = 470.0
+mouse_filter = 1
+bbcode_enabled = true
+scroll_following = true
+
+[node name="Command" type="LineEdit" parent="CursorLayer/DebugConsole/Panel" unique_id=1912843659]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 486.0
+offset_right = 942.0
+offset_bottom = 524.0
+placeholder_text = "Type command, e.g. watts on"

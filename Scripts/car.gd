@@ -10,13 +10,13 @@ var _velocity: Vector2 = Vector2.ZERO
 
 func _process(delta: float) -> void:
 	var dir := Vector2.ZERO
-	if Input.is_key_pressed(KEY_W):
+	if Input.is_key_pressed(GameSettings.get_key("move_up")):
 		dir.y -= 1
-	if Input.is_key_pressed(KEY_S):
+	if Input.is_key_pressed(GameSettings.get_key("move_down")):
 		dir.y += 1
-	if Input.is_key_pressed(KEY_A):
+	if Input.is_key_pressed(GameSettings.get_key("move_left")):
 		dir.x -= 1
-	if Input.is_key_pressed(KEY_D):
+	if Input.is_key_pressed(GameSettings.get_key("move_right")):
 		dir.x += 1
 
 	var target_velocity := Vector2.ZERO

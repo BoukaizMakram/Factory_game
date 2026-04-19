@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://dnbpy0r2hxirs"
+path="res://.godot/imported/crushed 3.mp3-29ee99612ec364ce7145eddc3b72a9d0.mp3str"
+
+[deps]
+
+source_file="res://SFX/raw/crushed 3.mp3"
+dest_files=["res://.godot/imported/crushed 3.mp3-29ee99612ec364ce7145eddc3b72a9d0.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

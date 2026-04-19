@@ -2,17 +2,22 @@ class_name InventoryUI
 extends Control
 
 signal slot_clicked(index: int, slot: Dictionary)
+signal slot_hovered(index: int, slot: Dictionary)
+signal slot_unhovered(index: int)
+signal inventory_open_requested
 
 @export var title: String = "INVENTORY"
 @export var columns: int = 6
-@export var rows: int = 6
+@export var rows: int = 4
 @export var slot_size: Vector2 = Vector2(96, 96)
 @export var slot_gap: int = 28
 @export var max_stack_size: int = 100
-@export var close_key: int = KEY_I
+@export var close_key: int = KEY_E
 @export var seed_preview_items: bool = false
 @export var open_sound: AudioStream
 @export var close_sound: AudioStream
+@export var placeable_move_sound: AudioStream = preload("res://SFX/raw/metal.mp3")
+@export var duck_db: float = -8.0
 @export var inventory_holder_path: NodePath
 
 var inventory: Inventory
@@ -22,11 +27,13 @@ var _title_label: Label
 var _close_button: Button
 var _slot_nodes: Array[Button] = []
 var _selected_slot_index: int = -1
+var _hovered_slot_index: int = -1
+var _hotbar_ui_ref: HotbarUI
 
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	mouse_filter = Control.MOUSE_FILTER_STOP
+	mouse_filter = Control.MOUSE_FILTER_PASS
 	z_index = 2000
 	z_as_relative = false
 	visible = false
@@ -48,8 +55,62 @@ func _ready() -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
-		if event.keycode == close_key:
+		if event.keycode == GameSettings.get_key("inventory"):
 			toggle()
+
+
+func _input(event: InputEvent) -> void:
+	if not visible:
+		return
+	if event is InputEventKey and event.pressed and not event.echo:
+		if event.keycode == GameSettings.get_key("pause"):
+			close()
+			get_viewport().set_input_as_handled()
+			return
+		if _hovered_slot_index < 0 or inventory == null:
+			return
+		var hotbar_index: int = _hotbar_index_for_key(event.keycode)
+		if hotbar_index >= 0:
+			_assign_hovered_to_hotbar(hotbar_index)
+			get_viewport().set_input_as_handled()
+
+
+func _hotbar_index_for_key(keycode: int) -> int:
+	for i in range(6):
+		if keycode == GameSettings.get_key("hotbar_%d" % (i + 1)):
+			return i
+	return -1
+
+
+func _assign_hovered_to_hotbar(hotbar_index: int) -> void:
+	if inventory == null or _hovered_slot_index < 0:
+		return
+	var slot: Dictionary = inventory.get_slot(_hovered_slot_index).duplicate()
+	if slot.is_empty():
+		return
+	var hotbar: HotbarUI = _find_hotbar_ui()
+	if hotbar == null:
+		return
+	var hotbar_inventory: Inventory = hotbar.get_inventory()
+	if hotbar_inventory == null:
+		return
+	var hotbar_slot: Dictionary = hotbar_inventory.get_slot(hotbar_index).duplicate()
+	inventory.set_slot_data(_hovered_slot_index, hotbar_slot)
+	hotbar_inventory.set_slot_data(hotbar_index, slot)
+	if _slot_is_placeable(slot) or _slot_is_placeable(hotbar_slot):
+		_play_sound(placeable_move_sound)
+
+
+func _find_hotbar_ui() -> HotbarUI:
+	if _hotbar_ui_ref != null and is_instance_valid(_hotbar_ui_ref):
+		return _hotbar_ui_ref
+	var current_scene: Node = get_tree().current_scene
+	if current_scene != null:
+		_hotbar_ui_ref = current_scene.find_child("HotbarUI", true, false) as HotbarUI
+		if _hotbar_ui_ref != null:
+			return _hotbar_ui_ref
+	_hotbar_ui_ref = get_tree().root.find_child("HotbarUI", true, false) as HotbarUI
+	return _hotbar_ui_ref
 
 
 func open_inventory(next_inventory: Inventory = null, next_title: String = "") -> void:
@@ -60,11 +121,22 @@ func open_inventory(next_inventory: Inventory = null, next_title: String = "") -
 	_title_label.text = title
 	visible = true
 	_refresh()
+	SFX.duck_master(&"inventory", duck_db)
 	_play_sound(open_sound)
 
 
 func get_inventory() -> Inventory:
 	return inventory
+
+
+func is_mouse_over_slot() -> bool:
+	if not visible:
+		return false
+	var mouse_position: Vector2 = get_global_mouse_position()
+	for slot_button in _slot_nodes:
+		if slot_button != null and slot_button.visible and slot_button.get_global_rect().has_point(mouse_position):
+			return true
+	return false
 
 
 func set_selected_slot(index: int) -> void:
@@ -76,6 +148,7 @@ func close() -> void:
 	if not visible:
 		return
 	visible = false
+	SFX.unduck_master(&"inventory")
 	_play_sound(close_sound)
 
 
@@ -83,6 +156,7 @@ func toggle() -> void:
 	if visible:
 		close()
 	else:
+		inventory_open_requested.emit()
 		open_inventory()
 
 
@@ -110,6 +184,7 @@ func _build_ui() -> void:
 	var backdrop: ColorRect = get_node_or_null("Backdrop") as ColorRect
 	if backdrop != null:
 		backdrop.set_anchors_preset(Control.PRESET_FULL_RECT)
+		backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 	_title_label = get_node_or_null("Title") as Label
 	if _title_label != null:
@@ -125,11 +200,13 @@ func _build_ui() -> void:
 	if _panel == null:
 		push_warning("InventoryUI needs a child Panel node.")
 		return
+	_panel.mouse_filter = Control.MOUSE_FILTER_PASS
 
 	_grid = _panel.get_node_or_null("Grid") as GridContainer
 	if _grid == null:
 		push_warning("InventoryUI Panel needs a Grid child.")
 		return
+	_grid.mouse_filter = Control.MOUSE_FILTER_PASS
 
 	_rebuild_slots()
 
@@ -139,49 +216,28 @@ func _rebuild_slots() -> void:
 	if _collect_existing_slots():
 		return
 	var template: Button = _grid.get_node_or_null("SlotTemplate") as Button
-	if template == null:
-		push_warning("InventoryUI Grid needs a SlotTemplate Button.")
-		return
-	template.visible = false
-	for child in _grid.get_children():
-		if child != template:
-			child.queue_free()
-	for i in range(max(1, columns * rows)):
-		var slot_button: Button = template.duplicate() as Button
-		if slot_button == null:
-			continue
-		slot_button.name = "Slot%d" % i
-		slot_button.visible = true
-		slot_button.mouse_filter = Control.MOUSE_FILTER_STOP
-		slot_button.focus_mode = Control.FOCUS_NONE
-		slot_button.pressed.connect(_on_slot_pressed.bind(i))
-		_grid.add_child(slot_button)
-
-		var icon: TextureRect = slot_button.get_node_or_null("Icon") as TextureRect
-		if icon != null:
-			icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-
-		var amount_label: Label = slot_button.get_node_or_null("Amount") as Label
-		if amount_label != null:
-			amount_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-
-		var selected_marker: CanvasItem = slot_button.get_node_or_null("Selected") as CanvasItem
-		if selected_marker != null:
-			selected_marker.visible = i == _selected_slot_index
-
-		_slot_nodes.append(slot_button)
+	if template != null:
+		template.visible = false
+	push_warning("InventoryUI uses scene-authored slots. Add Slot0, Slot1, ... under Panel/Grid.")
 
 
 func _collect_existing_slots() -> bool:
 	for child in _grid.get_children():
 		if child is Button and child.name.begins_with("Slot") and child.name != "SlotTemplate":
 			var slot_button: Button = child as Button
+			slot_button.mouse_filter = Control.MOUSE_FILTER_STOP
 			var slot_index: int = _slot_index_from_name(slot_button.name)
 			if slot_index < 0:
 				slot_index = _slot_nodes.size()
 			var slot_callable: Callable = Callable(self, "_on_slot_pressed").bind(slot_index)
 			if not slot_button.pressed.is_connected(slot_callable):
 				slot_button.pressed.connect(slot_callable)
+			var hover_callable: Callable = Callable(self, "_on_slot_hovered").bind(slot_index)
+			if not slot_button.mouse_entered.is_connected(hover_callable):
+				slot_button.mouse_entered.connect(hover_callable)
+			var unhover_callable: Callable = Callable(self, "_on_slot_unhovered").bind(slot_index)
+			if not slot_button.mouse_exited.is_connected(unhover_callable):
+				slot_button.mouse_exited.connect(unhover_callable)
 			_slot_nodes.append(slot_button)
 	return not _slot_nodes.is_empty()
 
@@ -234,8 +290,22 @@ func _on_slot_pressed(index: int) -> void:
 	var slot: Dictionary = {}
 	if inventory != null:
 		slot = inventory.get_slot(index)
-	print("Inventory slot %d: %s" % [index, _debug_slot_text(slot)])
+	DebugConsole.log("Inventory slot %d: %s" % [index, _debug_slot_text(slot)])
 	slot_clicked.emit(index, slot)
+
+
+func _on_slot_hovered(index: int) -> void:
+	_hovered_slot_index = index
+	var slot: Dictionary = {}
+	if inventory != null:
+		slot = inventory.get_slot(index)
+	slot_hovered.emit(index, slot)
+
+
+func _on_slot_unhovered(index: int) -> void:
+	if _hovered_slot_index == index:
+		_hovered_slot_index = -1
+	slot_unhovered.emit(index)
 
 
 func _texture_for_slot(slot: Dictionary) -> Texture2D:
@@ -296,6 +366,12 @@ func _texture_for_node(node: Node) -> Texture2D:
 	return null
 
 
+func _slot_is_placeable(slot: Dictionary) -> bool:
+	if slot.is_empty():
+		return false
+	return String(slot.get("scene_path", "")).strip_edges() != ""
+
+
 func _seed_preview_inventory() -> void:
 	if inventory == null:
 		return
@@ -317,9 +393,6 @@ func _seed_preview_inventory() -> void:
 func _play_sound(stream: AudioStream) -> void:
 	if stream == null:
 		return
-	var player: AudioStreamPlayer = AudioStreamPlayer.new()
-	player.stream = stream
-	player.bus = &"Master"
-	add_child(player)
-	player.play()
-	player.finished.connect(player.queue_free)
+	var player: AudioStreamPlayer = SFX.play_oneshot(self, stream, 0.0)
+	if player != null:
+		player.bus = &"Master"

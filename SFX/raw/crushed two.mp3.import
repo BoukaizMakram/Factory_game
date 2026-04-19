@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://gcqmd5uh6nhw"
+path="res://.godot/imported/crushed two.mp3-4c8587e85e9ac0016627b12fa3a50ae8.mp3str"
+
+[deps]
+
+source_file="res://SFX/raw/crushed two.mp3"
+dest_files=["res://.godot/imported/crushed two.mp3-4c8587e85e9ac0016627b12fa3a50ae8.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

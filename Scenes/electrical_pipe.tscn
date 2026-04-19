@@ -124,9 +124,10 @@ scale = Vector2(9.41, 9.41)
 shape = SubResource("RectangleShape2D_8v6t6")
 
 [node name="Label" type="Label" parent="." unique_id=612151005]
+visible = false
+z_index = 100
 offset_left = -92.0
 offset_top = 97.0
 offset_right = 7.0
 offset_bottom = 176.0
-text = "100"
 label_settings = SubResource("LabelSettings_xkxx5")

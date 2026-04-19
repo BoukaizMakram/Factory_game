@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://hkyh2myn1vrh"
+path="res://.godot/imported/conveyorbelt loop.mp3-2f9d5ce485438b201ac106a535e720c3.mp3str"
+
+[deps]
+
+source_file="res://SFX/Machines/conveyorbelt loop.mp3"
+dest_files=["res://.godot/imported/conveyorbelt loop.mp3-2f9d5ce485438b201ac106a535e720c3.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

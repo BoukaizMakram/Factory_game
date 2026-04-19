@@ -24,11 +24,25 @@ const PURITY_HIGH: String = "high"
 @export var show_item_visuals: bool = true
 @export var hold_raw_items_until_processed: bool = false
 @export var item_capacity: int = MAX_ITEMS
+@export_group("Sound")
+@export var loop_sound: AudioStream = preload("res://SFX/Machines/conveyorbelt loop.mp3")
+@export var sound_volume_db: float = -8.0
+@export var sound_inner_distance: float = 128.0
+@export var sound_max_distance: float = 4000.0
+@export var sound_attenuation: float = 1.4
+@export var sound_distance_curve: float = 1.0
+@export var sound_fade_in_seconds: float = 0.35
+@export var sound_fade_out_seconds: float = 0.5
+@export var sound_silent_db: float = -60.0
+@export var sound_pitch_base: float = 1.0
+@export var sound_pitch_variance: float = 0.08
 
 static var _belts_by_cell: Dictionary = {}
 static var _belt_anchors_by_cell: Dictionary = {}
 
 var _tick_timer: float = 0.0
+var _loop_player: AudioStreamPlayer2D
+var _loop_should_play: bool = false
 
 
 func _ready() -> void:
@@ -63,17 +77,23 @@ func _exit_tree() -> void:
 func _process(delta: float) -> void:
 	var pl: Placeable = _get_placeable()
 	if pl == null or pl.ghost_mode:
+		_set_loop_sound(null, false)
+		_update_loop_sound_fade(delta)
 		return
 	_tick_timer += delta
 	if _tick_timer < TICK_INTERVAL:
+		_update_loop_sound_fade(delta)
 		return
 	var dt: float = _tick_timer
 	_tick_timer = 0.0
 	if pl.powered:
 		_tick(pl, dt)
 		_update_belt_animation_speed(pl, true)
+		_set_loop_sound(pl, true)
 	else:
 		_update_belt_animation_speed(pl, false)
+		_set_loop_sound(pl, false)
+	_update_loop_sound_fade(dt)
 	_update_item_visuals(pl)
 	_update_label(pl)
 
@@ -207,6 +227,70 @@ func _pause_sprite(sprite: AnimatedSprite2D) -> void:
 		return
 	if sprite.is_playing():
 		sprite.pause()
+
+
+func _set_loop_sound(pl: Placeable, playing: bool) -> void:
+	if pl == null or pl.ghost_mode:
+		_stop_loop_sound()
+		return
+	if loop_sound == null:
+		_stop_loop_sound()
+		return
+	var player: AudioStreamPlayer2D = _get_loop_player(pl)
+	if player == null:
+		return
+	_make_loop_stream(loop_sound)
+	if player.stream != loop_sound:
+		player.stream = loop_sound
+		player.volume_db = sound_silent_db
+	SFX.configure_camera_radius_2d(player)
+	if playing:
+		_loop_should_play = true
+		if not player.playing:
+			player.volume_db = sound_silent_db
+			SFX.apply_random_pitch(player, sound_pitch_base, sound_pitch_variance)
+			player.play()
+	else:
+		_loop_should_play = false
+
+
+func _stop_loop_sound() -> void:
+	_loop_should_play = false
+
+
+func _update_loop_sound_fade(delta: float) -> void:
+	if _loop_player == null or not is_instance_valid(_loop_player):
+		return
+	var active_volume: float = SFX.camera_distance_volume_db(_loop_player.global_position, sound_volume_db, sound_silent_db, sound_max_distance, sound_inner_distance, sound_distance_curve)
+	var target_volume: float = active_volume if _loop_should_play else sound_silent_db
+	var fade_seconds: float = sound_fade_in_seconds if _loop_should_play else sound_fade_out_seconds
+	if fade_seconds <= 0.0:
+		_loop_player.volume_db = target_volume
+	else:
+		var db_span: float = absf(maxf(sound_volume_db, active_volume) - sound_silent_db)
+		var step: float = maxf(db_span, 0.001) * delta / fade_seconds
+		_loop_player.volume_db = move_toward(_loop_player.volume_db, target_volume, step)
+	if not _loop_should_play and _loop_player.playing and _loop_player.volume_db <= sound_silent_db + 0.1:
+		_loop_player.stop()
+
+
+func _get_loop_player(pl: Placeable) -> AudioStreamPlayer2D:
+	if _loop_player != null and is_instance_valid(_loop_player):
+		return _loop_player
+	var existing: Node = pl.get_node_or_null("BeltLoopSound")
+	if existing is AudioStreamPlayer2D:
+		_loop_player = existing as AudioStreamPlayer2D
+		return _loop_player
+	_loop_player = AudioStreamPlayer2D.new()
+	_loop_player.name = "BeltLoopSound"
+	_loop_player.autoplay = false
+	pl.add_child(_loop_player)
+	return _loop_player
+
+
+func _make_loop_stream(stream: AudioStream) -> void:
+	if stream is AudioStreamMP3:
+		(stream as AudioStreamMP3).loop = true
 
 
 func _update_item_visuals(pl: Placeable) -> void:

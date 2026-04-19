@@ -835,17 +835,17 @@ animation_max_fps = 16.0
 [node name="DrillerLogic" type="Node2D" parent="." unique_id=641673417]
 script = ExtResource("49_g7rj5")
 mining_time_multiplier = 2.0
+sound_volume_db = -10.0
 
 [node name="up" type="AnimatedSprite2D" parent="." unique_id=2018185116]
 visible = false
-z_index = 5
 position = Vector2(0, -73)
 sprite_frames = SubResource("SpriteFrames_udjce")
 animation = &"up"
 frame_progress = 0.6213745
 
 [node name="Marker2D" type="Marker2D" parent="up" unique_id=552477059]
-position = Vector2(0, -252.88501)
+position = Vector2(0, -181)
 rotation = -1.5707964
 
 [node name="Hover" type="Sprite2D" parent="up" unique_id=434976015]
@@ -856,36 +856,39 @@ texture = ExtResource("197_wjee0")
 
 [node name="Arrow" type="Sprite2D" parent="up" unique_id=992444583]
 z_index = 10
-position = Vector2(1, -251.88501)
+position = Vector2(1, -199.88501)
 scale = Vector2(0.4426269, 0.4426269)
 texture = ExtResource("52_wjee0")
 
 [node name="down" type="AnimatedSprite2D" parent="." unique_id=1280177853]
-visible = false
-z_index = 5
 sprite_frames = SubResource("SpriteFrames_h0utk")
 animation = &"down"
 
 [node name="Marker2D" type="Marker2D" parent="down" unique_id=645405649]
-position = Vector2(0, 138)
+light_mask = 3
+visibility_layer = 3
+position = Vector2(0, 75.11502)
 rotation = 1.5707964
 
 [node name="Hover" type="Sprite2D" parent="down" unique_id=1830913102]
+light_mask = 3
+visibility_layer = 3
 z_index = 10
 position = Vector2(1, -92)
 scale = Vector2(0.83176386, 0.83176386)
 texture = ExtResource("197_wjee0")
 
 [node name="Arrow" type="Sprite2D" parent="down" unique_id=642505756]
+light_mask = 3
+visibility_layer = 3
 z_index = 10
-position = Vector2(1, 136.99997)
+position = Vector2(1, 74.11499)
 rotation = 3.1415927
 scale = Vector2(0.4426269, 0.4426269)
 texture = ExtResource("52_wjee0")
 
 [node name="left" type="AnimatedSprite2D" parent="." unique_id=112861365]
 visible = false
-z_index = 5
 position = Vector2(0, -70)
 sprite_frames = SubResource("SpriteFrames_8y1i8")
 animation = &"left"
@@ -908,7 +911,7 @@ scale = Vector2(0.4426269, 0.4426269)
 texture = ExtResource("52_wjee0")
 
 [node name="right" type="AnimatedSprite2D" parent="." unique_id=1303272957]
-z_index = 5
+visible = false
 sprite_frames = SubResource("SpriteFrames_hsyw6")
 frame = 41
 frame_progress = 0.07598748

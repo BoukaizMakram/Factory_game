@@ -848,6 +848,8 @@ allow_belt_overlap = true
 
 [node name="crusher logic" type="Node2D" parent="." unique_id=37532123]
 script = ExtResource("2_crusher")
+sound_volume_db = -10.0
+action_volume_db = 0.0
 
 [node name="TransportLogic" type="Node2D" parent="." unique_id=1349336164]
 script = ExtResource("3_transport")
@@ -857,7 +859,7 @@ item_capacity = 1
 
 [node name="left" type="AnimatedSprite2D" parent="." unique_id=1271180620]
 visible = false
-z_index = 5
+z_index = 2
 sprite_frames = SubResource("SpriteFrames_665l4")
 animation = &"left"
 frame = 39
@@ -879,7 +881,7 @@ texture = ExtResource("53_6l6rh")
 
 [node name="right" type="AnimatedSprite2D" parent="." unique_id=447537957]
 visible = false
-z_index = 5
+z_index = 2
 sprite_frames = SubResource("SpriteFrames_qbb8j")
 animation = &"right"
 frame_progress = 0.23006849
@@ -900,7 +902,7 @@ texture = ExtResource("53_6l6rh")
 
 [node name="up" type="AnimatedSprite2D" parent="." unique_id=977072105]
 visible = false
-z_index = 5
+z_index = 2
 sprite_frames = SubResource("SpriteFrames_kac51")
 animation = &"up"
 
@@ -918,12 +920,13 @@ scale = Vector2(0.4426269, 0.4426269)
 texture = ExtResource("53_6l6rh")
 
 [node name="down" type="AnimatedSprite2D" parent="." unique_id=1014555896]
-z_index = 5
+z_index = 2
 sprite_frames = SubResource("SpriteFrames_p1plc")
 animation = &"down"
 frame_progress = 0.4814592
 
 [node name="Hover" type="Sprite2D" parent="down" unique_id=2110681588]
+visible = false
 z_index = 10
 position = Vector2(1, -16)
 rotation = -4.712389
@@ -931,6 +934,7 @@ scale = Vector2(0.83176386, 0.83176386)
 texture = ExtResource("52_tdfwk")
 
 [node name="Arrow" type="Sprite2D" parent="down" unique_id=2087790659]
+visible = false
 z_index = 10
 position = Vector2(1, -22)
 rotation = -3.1415927

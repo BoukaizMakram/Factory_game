@@ -75,6 +75,7 @@ const INSPECT_Z_INDEX: int = 100
 @export var power_label: Label
 
 static var inspect_mode: bool = false
+static var power_labels_visible: bool = false
 
 var connection_mask: int = 0
 var has_power: bool = false
@@ -88,6 +89,8 @@ func _init() -> void:
 
 func _ready() -> void:
 	_resolve_cell_span()
+	if power_label != null:
+		power_label.visible = power_labels_visible
 	if ghost_mode:
 		_update_pipe_sprite()
 		return
@@ -259,7 +262,13 @@ func set_pipe_powered(is_powered: bool, produced: float = 0.0, consumed: float =
 	_update_visible_sprite_playback()
 	if power_label != null:
 		power_label.text = "Network: " + str(produced) + "W\nNeeded: " + str(consumed) + "W"
-		power_label.visible = true
+		power_label.visible = power_labels_visible
+
+
+func set_power_label_visible(enabled: bool) -> void:
+	power_labels_visible = enabled
+	if power_label != null:
+		power_label.visible = enabled
 
 
 ## Returns all cells this pipe provides power to.

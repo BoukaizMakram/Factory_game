@@ -827,6 +827,7 @@ watts_consumed = 2.0
 
 [node name="BeltLogic" type="Node2D" parent="." unique_id=314600159]
 script = ExtResource("1_yku3c")
+sound_volume_db = -15.0
 
 [node name="up" type="AnimatedSprite2D" parent="." unique_id=2091102403]
 visible = false
@@ -906,7 +907,7 @@ texture = ExtResource("196_b7e0r")
 
 [node name="OreTemplate" type="Sprite2D" parent="." unique_id=1305885278]
 visible = false
-z_index = 5
+z_index = 4
 position = Vector2(95, -21)
 scale = Vector2(0.524353, 0.524353)
 texture = ExtResource("196_ajfwj")

@@ -5,6 +5,18 @@ extends Node2D
 @export var speed_max_fps: float = 16.0
 @export var particle_start_frame: int = 30
 @export var particle_end_frame: int = 46
+@export_group("Sound")
+@export var loop_sound: AudioStream = preload("res://SFX/Machines/machine.mp3")
+@export var sound_volume_db: float = -6.0
+@export var sound_inner_distance: float = 128.0
+@export var sound_max_distance: float = 4000.0
+@export var sound_attenuation: float = 1.4
+@export var sound_distance_curve: float = 1.0
+@export var sound_fade_in_seconds: float = 0.35
+@export var sound_fade_out_seconds: float = 0.5
+@export var sound_silent_db: float = -60.0
+@export var sound_pitch_base: float = 1.0
+@export var sound_pitch_variance: float = 0.08
 
 var _mineable: Mineable
 var _timer: float = 0.0
@@ -13,6 +25,8 @@ var _drilling_sprite: AnimatedSprite2D
 var _stopping_sprite: AnimatedSprite2D
 var _drill_particles: Array[CPUParticles2D] = []
 var _ore_ready: bool = false
+var _loop_player: AudioStreamPlayer2D
+var _loop_should_play: bool = false
 
 
 func _ready() -> void:
@@ -23,24 +37,29 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	if _mineable == null:
 		_set_drilling(false)
+		_update_loop_sound_fade(delta)
 		return
 
 	var marker: Marker2D = _get_active_marker()
 	if marker == null:
 		_set_drilling(false)
+		_update_loop_sound_fade(delta)
 		return
 
 	var ore_scene: PackedScene = _mineable.ore_scene
 	if ore_scene == null:
 		_set_drilling(false)
+		_update_loop_sound_fade(delta)
 		return
 
 	var placeable: Placeable = _get_placeable()
 	if placeable == null:
 		_set_drilling(false)
+		_update_loop_sound_fade(delta)
 		return
 	if not placeable.powered:
 		_set_drilling(false)
+		_update_loop_sound_fade(delta)
 		return
 
 	var mining_time: float = _mineable.mining_time * maxf(mining_time_multiplier, 0.0)
@@ -49,23 +68,27 @@ func _process(delta: float) -> void:
 
 	if _is_output_blocked(marker):
 		_set_drilling(false)
+		_update_loop_sound_fade(delta)
 		return
 
 	if not _ore_ready:
 		_set_drilling(true)
 		_timer += delta
 		if _timer < mining_time:
+			_update_loop_sound_fade(delta)
 			return
 		_timer = 0.0
 		_ore_ready = true
 
 	if not _ore_ready:
 		_update_drill_particles()
+		_update_loop_sound_fade(delta)
 		return
 	if _spawn_ore(ore_scene, marker):
 		_ore_ready = false
 
 	_update_drill_particles()
+	_update_loop_sound_fade(delta)
 
 
 func _find_mineable() -> void:
@@ -83,9 +106,9 @@ func _find_mineable() -> void:
 		if collider is Area2D:
 			_mineable = _find_mineable_in_area(collider as Area2D, placeable.global_position)
 			if _mineable != null:
-				print("Mineable found: ", _mineable.ore_name)
+				DebugConsole.log("Mineable found: " + String(_mineable.ore_name))
 				return
-	print("No mineable found at ", placeable.global_position)
+	DebugConsole.log("No mineable found at " + str(placeable.global_position))
 
 
 func _get_active_marker() -> Marker2D:
@@ -112,8 +135,10 @@ func _get_active_sprite() -> AnimatedSprite2D:
 func _set_drilling(active: bool) -> void:
 	var placeable: Placeable = _get_placeable()
 	if placeable == null:
+		_stop_loop_sound()
 		return
 	var active_sprite: AnimatedSprite2D = _get_active_sprite()
+	_set_loop_sound(placeable, active)
 	if _drilling == active and _drilling_sprite == active_sprite:
 		if active and active_sprite != null:
 			_stopping_sprite = null
@@ -175,6 +200,67 @@ func _pause_sprite(sprite: AnimatedSprite2D) -> void:
 		return
 	if sprite.is_playing():
 		sprite.pause()
+
+
+func _set_loop_sound(placeable: Placeable, playing: bool) -> void:
+	if placeable == null or placeable.ghost_mode or loop_sound == null:
+		_stop_loop_sound()
+		return
+	var player: AudioStreamPlayer2D = _get_loop_player(placeable)
+	if player == null:
+		return
+	_make_loop_stream(loop_sound)
+	if player.stream != loop_sound:
+		player.stream = loop_sound
+		player.volume_db = sound_silent_db
+	SFX.configure_camera_radius_2d(player)
+	if playing:
+		_loop_should_play = true
+		if not player.playing:
+			player.volume_db = sound_silent_db
+			SFX.apply_random_pitch(player, sound_pitch_base, sound_pitch_variance)
+			player.play()
+	else:
+		_loop_should_play = false
+
+
+func _stop_loop_sound() -> void:
+	_loop_should_play = false
+
+
+func _update_loop_sound_fade(delta: float) -> void:
+	if _loop_player == null or not is_instance_valid(_loop_player):
+		return
+	var active_volume: float = SFX.camera_distance_volume_db(_loop_player.global_position, sound_volume_db, sound_silent_db, sound_max_distance, sound_inner_distance, sound_distance_curve)
+	var target_volume: float = active_volume if _loop_should_play else sound_silent_db
+	var fade_seconds: float = sound_fade_in_seconds if _loop_should_play else sound_fade_out_seconds
+	if fade_seconds <= 0.0:
+		_loop_player.volume_db = target_volume
+	else:
+		var db_span: float = absf(maxf(sound_volume_db, active_volume) - sound_silent_db)
+		var step: float = maxf(db_span, 0.001) * delta / fade_seconds
+		_loop_player.volume_db = move_toward(_loop_player.volume_db, target_volume, step)
+	if not _loop_should_play and _loop_player.playing and _loop_player.volume_db <= sound_silent_db + 0.1:
+		_loop_player.stop()
+
+
+func _get_loop_player(placeable: Placeable) -> AudioStreamPlayer2D:
+	if _loop_player != null and is_instance_valid(_loop_player):
+		return _loop_player
+	var existing: Node = placeable.get_node_or_null("DrillLoopSound")
+	if existing is AudioStreamPlayer2D:
+		_loop_player = existing as AudioStreamPlayer2D
+		return _loop_player
+	_loop_player = AudioStreamPlayer2D.new()
+	_loop_player.name = "DrillLoopSound"
+	_loop_player.autoplay = false
+	placeable.add_child(_loop_player)
+	return _loop_player
+
+
+func _make_loop_stream(stream: AudioStream) -> void:
+	if stream is AudioStreamMP3:
+		(stream as AudioStreamMP3).loop = true
 
 
 func _cache_drill_particles() -> void:

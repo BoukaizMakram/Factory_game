@@ -238,5 +238,10 @@ position = Vector2(848, 1805)
 
 [node name="PlayerInventory" type="Node" parent="." unique_id=2112217111]
 script = ExtResource("22_inventory_holder")
+slot_count = 24
+
+[node name="HotbarInventory" type="Node" parent="." unique_id=1022441505]
+script = ExtResource("22_inventory_holder")
+slot_count = 6
 
 [node name="UI" parent="." unique_id=929496667 instance=ExtResource("19_ui")]

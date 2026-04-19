@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://uwewlsh5hu7q"
+path="res://.godot/imported/electric 3.mp3-7901c24a67c982192ad07158784b6987.mp3str"
+
+[deps]
+
+source_file="res://SFX/raw/electric 3.mp3"
+dest_files=["res://.godot/imported/electric 3.mp3-7901c24a67c982192ad07158784b6987.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4
